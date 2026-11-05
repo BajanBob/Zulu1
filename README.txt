@@ -21,3 +21,9 @@ SIGNATURE CALL
 Each session opens with Zulu 1's call sign in Morse code (Z --..  U ..-  L .-..  U ..-  1 .----)
 then "This is Zulu one calling Master Shakai Stoute". The End session button plays the Morse call sign
 again and says "Zulu one out".
+
+ANDROID APP (APK)
+The android folder holds the Android app. When this project is pushed to GitHub,
+GitHub builds the APK automatically (see the Actions tab), and the file
+Zulu1-HamDog-Tutor.apk appears under Releases. Download it on the Android phone and
+tap it to install (allow "Install unknown apps" for the browser when asked).

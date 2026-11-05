@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+      - name: Copy the latest tutor page into the app
+        run: cp index.html android/app/src/main/assets/index.html
+      - name: Build APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Zulu1-HamDog-Tutor.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Zulu1-HamDog-Tutor-apk
+          path: Zulu1-HamDog-Tutor.apk
+      - name: Publish as a GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Zulu 1 Ham Dog Tutor ${{ github.run_number }}
+          files: Zulu1-HamDog-Tutor.apk

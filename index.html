@@ -292,7 +292,18 @@ function pickVoice(){
   const gb=voices.filter(v=>/en[-_]GB/i.test(v.lang));
   return gb.find(v=>FEMALE.test(v.name)) || gb.find(v=>!/male|daniel|george|arthur|oliver|ryan|thomas/i.test(v.name)) || gb[0] || voices.find(v=>/^en/i.test(v.lang)) || null;
 }
+/* Android app: speech goes through the phone's own UK text-to-speech */
+let ttsN=0;const ttsCb={};
+window.__ttsDone=id=>{const f=ttsCb[id];if(f){delete ttsCb[id];f()}};
+function stopSpeech(){if(window.AndroidTTS){try{AndroidTTS.stop()}catch(e){}}else if(synth)synth.cancel()}
 function speak(parts,{cancel=true,rate,onend}={}){
+  if(window.AndroidTTS){
+    const list=Array.isArray(parts)?parts:[parts];
+    list.forEach((t,i)=>{const id="u"+(++ttsN);
+      if(onend&&i===list.length-1){ttsCb[id]=onend;setTimeout(()=>window.__ttsDone(id),4000+t.length*120)}
+      try{AndroidTTS.speak(String(t),rate||S.settings.rate,cancel&&i===0,id)}catch(e){window.__ttsDone(id)}});
+    return;
+  }
   if(!synth){onend&&onend();return}
   if(cancel)synth.cancel();
   const v=pickVoice(),list=Array.isArray(parts)?parts:[parts];
@@ -499,7 +510,7 @@ function beryl(){
       <div class="set"><label for="voiceSel">Zulu's voice (UK)</label><select id="voiceSel" class="field">
         <option value="">Automatic UK female voice${cur?` (${esc(cur.name)})`:""}</option>
         ${(gb.length?gb:voices.filter(v=>/^en/i.test(v.lang))).map(v=>`<option ${S.settings.voice===v.name?"selected":""}>${esc(v.name)}</option>`).join("")}</select>
-        ${synth?"":`<p class="hint">This device does not offer spoken voices. Try Chrome, Safari or Edge.</p>`}</div>
+        ${synth||window.AndroidTTS?"":`<p class="hint">This device does not offer spoken voices. Try Chrome, Safari or Edge.</p>`}</div>
       <div class="set"><label for="rate">Speaking speed</label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="${S.settings.rate}"></div>
       <div class="set"><label for="revDay">Revision day</label><select id="revDay" class="field">${DAYS.map((d,i)=>`<option value="${i}" ${S.settings.revDay==i?"selected":""}>${d}</option>`).join("")}</select></div>
       <div class="set"><span class="switch"><input type="checkbox" id="echo" ${S.settings.echo?"checked":""}><label for="echo">Say each letter as Stoute types</label></span></div>
@@ -640,7 +651,7 @@ const bind={
   help(){common();$("#readHelp").onclick=()=>speak([...document.querySelectorAll("#view .trick")].map(t=>t.innerText.replace(/\n/g,". ")))}
 };
 function bindGame(){
-  const q=$("#quitG");if(q)q.onclick=()=>{game=null;synth&&synth.cancel();render()};
+  const q=$("#quitG");if(q)q.onclick=()=>{game=null;stopSpeech();render()};
   const ag=$("#again");if(ag)ag.onclick=()=>{const t=game.type,list=[...new Set(game.queue)],o={rev:game.rev,week:game.week};startGame(t,list,o);if(o.rev){game.title="📝 Revision Test";render()}};
   if(game.done)return;
   const w=cur();
@@ -686,7 +697,7 @@ function playMorse(done){
   setTimeout(done,t+500);
 }
 function signatureCall(mode){
-  if(calling)return;calling=true;synth&&synth.cancel();
+  if(calling)return;calling=true;stopSpeech();
   const btn=$("#radioBtn"),rep=$("#replayCall");btn.disabled=true;rep.hidden=true;
   $("#radioTitle").textContent=mode==="start"?"Zulu 1 calling...":"Zulu 1 signing off...";
   $("#radioText").textContent="Listen to the Morse code: Z U L U 1.";
