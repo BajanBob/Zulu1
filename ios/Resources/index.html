@@ -318,6 +318,12 @@ function pickVoice(){
   if(S.settings.voice){const v=voices.find(v=>v.name===S.settings.voice);if(v)return v}
   return ukVoices()[0]||null;
 }
+/* Android app: list the phone's UK voices so Granny Beryl can hear and choose them */
+function nativeVoices(){try{if(window.AndroidTTS&&typeof AndroidTTS.voices==="function"){
+  const v=JSON.parse(AndroidTTS.voices());return v.sort((a,b)=>(b.auto-a.auto)||(b.female-a.female)||(a.online-b.online)||(b.quality-a.quality))}}catch(e){}return null}
+function androidLabel(v,i){const m=v.name.match(/gb([a-z])/i);const n={a:"Voice A",b:"Voice B",c:"Voice C",d:"Voice D",g:"Voice G"}[m&&m[1].toLowerCase()];
+  return (n||("UK voice "+(i+1)))+(v.online?" (online)":"")}
+try{if(window.AndroidTTS&&typeof AndroidTTS.useVoice==="function")AndroidTTS.useVoice(S.settings.androidVoice||"")}catch(e){}
 const niceName=n=>n.replace(/^Microsoft\s+/i,"").replace(/\s*-\s*English.*$/i,"").replace(/\s*\(English.*\)$/i,"").replace(/Online \(Natural\)/i,"").trim();
 const SAMPLE=`Hello, Master Shakai Stoute. I am Zulu one, your personal tutor. Let's spell the word "because". You are very bright, and shining like the sun!`;
 /* Android app: speech goes through the phone's own UK text-to-speech */
@@ -540,8 +546,19 @@ function rewards(){
 }
 function beryl(){
   const list=ukVoices(),cur=pickVoice();
-  const samples=window.AndroidTTS
-    ?`<div class="vrow on"><div><strong>Phone's UK voice</strong><small>The app uses the best UK female voice on this phone.</small></div>
+  const nv=nativeVoices();
+  const samples=window.AndroidTTS&&nv
+    ?(nv.length?`<div class="vrow ${!S.settings.androidVoice?"on":""}"><div><strong>Automatic</strong><small>Zulu picks the clearest UK female voice on this phone.</small></div>
+       <div class="row"><button class="btn" style="--c:var(--sea)" data-nsample="">▶ Play sample</button>
+       ${!S.settings.androidVoice?`<span class="pick">✓ Zulu's voice</span>`:`<button class="btn ghost" data-nuse="">Use this voice</button>`}</div></div>`+
+      nv.map((v,i)=>`<div class="vrow ${S.settings.androidVoice===v.name?"on":""}"><div><strong>${esc(androidLabel(v,i))}</strong>
+       <small>${v.female?"Female · ":"Male · "}${v.online?"Online, needs internet · clearest":"Works offline"}${v.auto?" · Best match":""}</small></div>
+       <div class="row"><button class="btn" style="--c:var(--sea)" data-nsample="${esc(v.name)}">▶ Play sample</button>
+       ${S.settings.androidVoice===v.name?`<span class="pick">✓ Zulu's voice</span>`:`<button class="btn ghost" data-nuse="${esc(v.name)}">Use this voice</button>`}</div></div>`).join("")
+      :`<p class="hint">No UK English voices are installed yet. Follow "How to get more natural voices" below, then come back here.</p>`)
+      +(AndroidTTS.googleEngine&&!AndroidTTS.googleEngine()?`<p class="example">This phone does not have Google's speech engine, which pronounces words best. Install <b>Speech Services by Google</b> from the Play Store, then restart the app.</p>`:"")
+    :window.AndroidTTS
+    ?`<div class="vrow on"><div><strong>Phone's UK voice</strong><small>The app uses the best UK female voice on this device.</small></div>
        <button class="btn" style="--c:var(--sea)" data-sample="">▶ Play sample</button></div>`
     :list.length?list.map((v,i)=>`<div class="vrow ${cur&&cur.name===v.name?"on":""}"><div><strong>${esc(niceName(v.name))}</strong>
        <small>${NATURAL.test(v.name)?"✨ Natural · ":""}${isFemale(v)?"Female · ":""}${esc(v.lang)}${i===0?" · Best match":""}</small></div>
@@ -556,7 +573,7 @@ function beryl(){
       <details><summary><b>How to get more natural voices</b></summary>
         <p><b>Windows:</b> open the tutor in Microsoft Edge (the Windows version does this). Edge adds the natural voices Sonia, Libby and Maisie.</p>
         <p><b>iPhone or iPad:</b> Settings › Accessibility › Spoken Content › Voices › English › British, then download <b>Serena (Premium)</b> or <b>Kate (Enhanced)</b>.</p>
-        <p><b>Android:</b> Settings › Text-to-speech › Speech Services by Google › Install voice data › English (United Kingdom), and choose a female voice.</p>
+        <p><b>Android:</b> Settings › search <b>Text-to-speech</b> › Preferred engine › <b>Speech Services by Google</b>. Tap ⚙️ › Install voice data › <b>English (United Kingdom)</b>. Restart the Zulu app, then play the samples here. Online voices sound clearest when there is internet.</p>
       </details></div>
     <div class="grid2">
       <div class="set"><label for="treat">Treat reward</label><input id="treat" class="field" value="${esc(S.settings.treat)}"></div>
@@ -699,6 +716,9 @@ const bind={
       if(b.dataset.sample===""){speak(SAMPLE,{rate:r});return}
       const v=ukVoices()[+b.dataset.sample];if(!v)return;
       if(!synth)return;synth.cancel();const u=new SpeechSynthesisUtterance(SAMPLE);u.voice=v;u.lang=v.lang;u.rate=r;u.pitch=1;keep.push(u);synth.speak(u)});
+    document.querySelectorAll("[data-nsample]").forEach(b=>b.onclick=()=>{try{AndroidTTS.sample(SAMPLE,+$("#rate").value,b.dataset.nsample||S.settings.androidVoice&&""||"")}catch(e){}});
+    document.querySelectorAll("[data-nuse]").forEach(b=>b.onclick=()=>{S.settings.androidVoice=b.dataset.nuse;save();
+      try{AndroidTTS.useVoice(S.settings.androidVoice)}catch(e){}render();toast("Zulu's voice changed");speak(`Hello, ${NAME}. This is my new voice.`)});
     document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const v=ukVoices()[+b.dataset.use];if(!v)return;
       S.settings.voice=v.name;save();render();toast(niceName(v.name)+" is now Zulu's voice");speak(`Hello, ${NAME}. This is my new voice.`)});
     $("#resetStars").onclick=()=>confirmBox("Reset Stoute's stars to zero?",()=>{S.stars=0;save();render();toast("Stars reset")});
