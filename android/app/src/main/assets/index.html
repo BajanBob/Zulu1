@@ -298,6 +298,14 @@ function pickVoice(){
 let ttsN=0;const ttsCb={};
 window.__ttsDone=id=>{const f=ttsCb[id];if(f){delete ttsCb[id];f()}};
 function stopSpeech(){if(window.AndroidTTS){try{AndroidTTS.stop()}catch(e){}}else if(synth)synth.cancel()}
+/* Phones only allow speech that starts from a tap. Speaking a silent word during the tap
+   unlocks the voice so announcements made later (after the Morse code) can be heard. */
+const keep=[];
+function unlockSpeech(){
+  if(window.AndroidTTS){stopSpeech();return}
+  if(!synth)return;
+  try{synth.cancel();synth.resume();const u=new SpeechSynthesisUtterance(" ");u.volume=0;u.lang="en-GB";keep.push(u);synth.speak(u)}catch(e){}
+}
 function speak(parts,{cancel=true,rate,onend}={}){
   if(window.AndroidTTS){
     const list=Array.isArray(parts)?parts:[parts];
@@ -307,10 +315,12 @@ function speak(parts,{cancel=true,rate,onend}={}){
     return;
   }
   if(!synth){onend&&onend();return}
-  if(cancel)synth.cancel();
+  if(cancel&&(synth.speaking||synth.pending))synth.cancel();
+  try{synth.resume()}catch(e){}
   const v=pickVoice(),list=Array.isArray(parts)?parts:[parts];
+  if(keep.length>20)keep.splice(0,keep.length-20);
   list.forEach((t,i)=>{
-    const u=new SpeechSynthesisUtterance(t);
+    const u=new SpeechSynthesisUtterance(t);keep.push(u);
     if(v)u.voice=v; u.lang=v?v.lang:"en-GB"; u.rate=rate||S.settings.rate; u.pitch=1.1;
     if(onend&&i===list.length-1){let fired=false;const f=()=>{if(!fired){fired=true;onend()}};u.onend=f;u.onerror=f;setTimeout(f,4000+t.length*120)}
     synth.speak(u);
@@ -699,7 +709,7 @@ function playMorse(done){
   setTimeout(done,t+500);
 }
 function signatureCall(mode){
-  if(calling)return;calling=true;stopSpeech();
+  if(calling)return;calling=true;unlockSpeech();
   const btn=$("#radioBtn"),rep=$("#replayCall");btn.disabled=true;rep.hidden=true;
   $("#radioTitle").textContent=mode==="start"?"Zulu 1 calling...":"Zulu 1 signing off...";
   $("#radioText").textContent="Listen to the Morse code: Z U L U 1.";
