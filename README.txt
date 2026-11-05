@@ -1,5 +1,5 @@
 ZULU 1 HAM DOG TUTOR
-Personal spelling tutor for Miss Elian
+Personal spelling tutor for Master Shakai Stoute
 
 HOW TO OPEN
 Double-click index.html. It opens in a web browser (Chrome, Edge or Safari work best).
@@ -19,7 +19,7 @@ Progress is saved in the browser on the device being used.
 
 SIGNATURE CALL
 Each session opens with Zulu 1's call sign in Morse code (Z --..  U ..-  L .-..  U ..-  1 .----)
-then "This is Zulu one calling Miss Elian". The End session button plays the Morse call sign
+then "This is Zulu one calling Master Shakai Stoute". The End session button plays the Morse call sign
 again and says "Zulu one out".
 
 ANDROID APP (APK)
