@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
         web.loadUrl("file:///android_asset/index.html");
     }
 
-    /** Google's UK voices gba, gbc and gbg are female; prefer an offline one. */
+    /** Google's UK voices gba, gbc and gbg are female; pick the highest-quality offline one. */
     private void pickFemaleUkVoice() {
         try {
             Voice best = null;
@@ -52,7 +52,8 @@ public class MainActivity extends Activity {
                 if (!"GBR".equals(v.getLocale().getISO3Country())) continue;
                 String n = v.getName().toLowerCase(Locale.ROOT);
                 boolean female = n.contains("female") || n.contains("gba") || n.contains("gbc") || n.contains("gbg");
-                if (female && (best == null || best.isNetworkConnectionRequired())) best = v;
+                if (!female || v.isNetworkConnectionRequired()) continue;
+                if (best == null || v.getQuality() > best.getQuality()) best = v;
             }
             if (best != null) tts.setVoice(best);
         } catch (Exception ignored) { }
@@ -68,7 +69,7 @@ public class MainActivity extends Activity {
         public void speak(String text, float rate, boolean flush, String id) {
             if (tts == null) { finished(id); return; }
             tts.setSpeechRate(rate);
-            tts.setPitch(1.1f);
+            tts.setPitch(1.0f);
             tts.speak(text, flush ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null, id);
         }
 

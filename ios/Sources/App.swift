@@ -57,8 +57,9 @@ final class TutorViewController: UIViewController, WKScriptMessageHandler, AVSpe
     private static func pickUkFemaleVoice() -> AVSpeechSynthesisVoice? {
         let uk = AVSpeechSynthesisVoice.speechVoices().filter { $0.language == "en-GB" }
         let female = uk.filter { $0.gender == .female }
-        return female.first { $0.quality == .enhanced } ?? female.first ?? uk.first
-            ?? AVSpeechSynthesisVoice(language: "en-GB")
+        // Best quality first: premium, then enhanced, then default.
+        let best = female.max { $0.quality.rawValue < $1.quality.rawValue }
+        return best ?? uk.max { $0.quality.rawValue < $1.quality.rawValue } ?? AVSpeechSynthesisVoice(language: "en-GB")
     }
 
     func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -74,7 +75,7 @@ final class TutorViewController: UIViewController, WKScriptMessageHandler, AVSpe
         let u = AVSpeechUtterance(string: text)
         u.voice = voice
         u.rate = Float(Double(AVSpeechUtteranceDefaultSpeechRate) * rate)
-        u.pitchMultiplier = 1.1
+        u.pitchMultiplier = 1.0
         ids[ObjectIdentifier(u)] = id
         synth.speak(u)
     }

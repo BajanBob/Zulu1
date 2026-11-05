@@ -161,6 +161,16 @@ label{font-weight:700}
 @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);
   padding:10px 18px;border-radius:999px;font-weight:700;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.vlist{display:flex;flex-direction:column;gap:8px}
+.vrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;background:var(--surface);border:2px solid var(--line)}
+.vrow.on{border-color:var(--sea);border-width:3px}
+.vrow>div:first-child{min-width:0;display:flex;flex-direction:column}
+.vrow small{color:var(--muted)}
+.vrow .btn{font-size:1rem;padding:8px 14px}
+.pick{font-weight:800;color:var(--good)}
+details{display:flex;flex-direction:column;gap:6px}
+details summary{cursor:pointer;padding:4px 0}
+details p{margin-top:6px}
 /* Radio signature call */
 .radio{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
   background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);
@@ -286,12 +296,28 @@ let voices=[];
 const FEMALE=/female|serena|kate|libby|sonia|maisie|martha|hazel|susan|stephanie|fiona|amy|emma|olivia|mia|bella/i;
 function loadVoices(){if(!synth)return;voices=synth.getVoices();}
 if(synth){loadVoices();synth.onvoiceschanged=()=>{loadVoices();if(view==="beryl")render()}}
+/* Rank voices so the most natural-sounding UK female voice comes first.
+   Natural/neural voices: Edge (Sonia, Libby, Maisie), Safari premium/enhanced (Serena, Kate, Martha). */
+const NATURAL=/natural|neural|premium|enhanced|online/i;
+const MALE=/\b(male|ryan|thomas|daniel|george|arthur|oliver|alfie|elliot|noah|ethan|malcolm|rocko|eddy|grandpa|reed)\b/i;
+const isFemale=v=>FEMALE.test(v.name)&&!/\bmale\b/i.test(v.name.replace(/female/ig,""));
+function voiceScore(v){let s=0;
+  if(NATURAL.test(v.name))s+=50;
+  if(/sonia/i.test(v.name))s+=8;
+  if(/libby|serena|maisie/i.test(v.name))s+=6;
+  if(isFemale(v))s+=20;
+  if(MALE.test(v.name)&&!isFemale(v))s-=40;
+  if(/google uk english female/i.test(v.name))s+=15;
+  return s}
+function ukVoices(){const gb=voices.filter(v=>/en[-_]GB/i.test(v.lang));
+  return (gb.length?gb:voices.filter(v=>/^en/i.test(v.lang))).slice().sort((a,b)=>voiceScore(b)-voiceScore(a))}
 function pickVoice(){
   if(!voices.length)return null;
   if(S.settings.voice){const v=voices.find(v=>v.name===S.settings.voice);if(v)return v}
-  const gb=voices.filter(v=>/en[-_]GB/i.test(v.lang));
-  return gb.find(v=>FEMALE.test(v.name)) || gb.find(v=>!/male|daniel|george|arthur|oliver|ryan|thomas/i.test(v.name)) || gb[0] || voices.find(v=>/^en/i.test(v.lang)) || null;
+  return ukVoices()[0]||null;
 }
+const niceName=n=>n.replace(/^Microsoft\s+/i,"").replace(/\s*-\s*English.*$/i,"").replace(/\s*\(English.*\)$/i,"").replace(/Online \(Natural\)/i,"").trim();
+const SAMPLE=`Hello, Master Shakai Stoute. I am Zulu one, your personal tutor. Let's spell the word "because". You are very bright, and shining like the sun!`;
 /* Android app: speech goes through the phone's own UK text-to-speech */
 let ttsN=0;const ttsCb={};
 window.__ttsDone=id=>{const f=ttsCb[id];if(f){delete ttsCb[id];f()}};
@@ -319,7 +345,7 @@ function speak(parts,{cancel=true,rate,onend}={}){
   if(keep.length>20)keep.splice(0,keep.length-20);
   list.forEach((t,i)=>{
     const u=new SpeechSynthesisUtterance(t);keep.push(u);
-    if(v)u.voice=v; u.lang=v?v.lang:"en-GB"; u.rate=rate||S.settings.rate; u.pitch=1.1;
+    if(v)u.voice=v; u.lang=v?v.lang:"en-GB"; u.rate=rate||S.settings.rate; u.pitch=1;
     if(onend&&i===list.length-1){let fired=false;const f=()=>{if(!fired){fired=true;onend()}};u.onend=f;u.onerror=f;setTimeout(f,4000+t.length*120)}
     synth.speak(u);
   });
@@ -511,21 +537,33 @@ function rewards(){
       <button class="btn" style="--c:var(--tang)" id="cheer">🔊 Cheer me on</button></div>`);
 }
 function beryl(){
-  const gb=voices.filter(v=>/en[-_]GB/i.test(v.lang)),cur=pickVoice();
+  const list=ukVoices(),cur=pickVoice();
+  const samples=window.AndroidTTS
+    ?`<div class="vrow on"><div><strong>Phone's UK voice</strong><small>The app uses the best UK female voice on this phone.</small></div>
+       <button class="btn" style="--c:var(--sea)" data-sample="">▶ Play sample</button></div>`
+    :list.length?list.map((v,i)=>`<div class="vrow ${cur&&cur.name===v.name?"on":""}"><div><strong>${esc(niceName(v.name))}</strong>
+       <small>${NATURAL.test(v.name)?"✨ Natural · ":""}${isFemale(v)?"Female · ":""}${esc(v.lang)}${i===0?" · Best match":""}</small></div>
+       <div class="row"><button class="btn" style="--c:var(--sea)" data-sample="${i}">▶ Play sample</button>
+       ${cur&&cur.name===v.name?`<span class="pick">✓ Zulu's voice</span>`:`<button class="btn ghost" data-use="${i}">Use this voice</button>`}</div></div>`).join("")
+    :`<p class="hint">${synth?"Voices are still loading. Open this section again in a moment.":"This device does not offer spoken voices. Try Chrome, Safari or Edge."}</p>`;
   return panel("var(--rose)","Granny Beryl's Corner",`
     <p class="hint">Settings for Granny Beryl. Set the treat, choose the voice, and pick revision day.</p>
+    <div class="trick" style="--c:var(--sea)"><h3>🎙️ Voice samples</h3>
+      <p class="hint">Play each voice and choose the one that sounds most natural. Voices marked ✨ Natural sound the most like a real person.</p>
+      <div class="vlist">${samples}</div>
+      <details><summary><b>How to get more natural voices</b></summary>
+        <p><b>Windows:</b> open the tutor in Microsoft Edge (the Windows version does this). Edge adds the natural voices Sonia, Libby and Maisie.</p>
+        <p><b>iPhone or iPad:</b> Settings › Accessibility › Spoken Content › Voices › English › British, then download <b>Serena (Premium)</b> or <b>Kate (Enhanced)</b>.</p>
+        <p><b>Android:</b> Settings › Text-to-speech › Speech Services by Google › Install voice data › English (United Kingdom), and choose a female voice.</p>
+      </details></div>
     <div class="grid2">
       <div class="set"><label for="treat">Treat reward</label><input id="treat" class="field" value="${esc(S.settings.treat)}"></div>
       <div class="set"><label for="target">Stars needed for the treat</label><input id="target" class="field" type="number" min="5" max="1000" value="${S.settings.target}"></div>
-      <div class="set"><label for="voiceSel">Zulu's voice (UK)</label><select id="voiceSel" class="field">
-        <option value="">Automatic UK female voice${cur?` (${esc(cur.name)})`:""}</option>
-        ${(gb.length?gb:voices.filter(v=>/^en/i.test(v.lang))).map(v=>`<option ${S.settings.voice===v.name?"selected":""}>${esc(v.name)}</option>`).join("")}</select>
-        ${synth||window.AndroidTTS?"":`<p class="hint">This device does not offer spoken voices. Try Chrome, Safari or Edge.</p>`}</div>
-      <div class="set"><label for="rate">Speaking speed</label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="${S.settings.rate}"></div>
+      <div class="set"><label for="rate">Speaking speed</label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="${S.settings.rate}"><small class="hint">Middle is the most natural.</small></div>
       <div class="set"><label for="revDay">Revision day</label><select id="revDay" class="field">${DAYS.map((d,i)=>`<option value="${i}" ${S.settings.revDay==i?"selected":""}>${d}</option>`).join("")}</select></div>
       <div class="set"><span class="switch"><input type="checkbox" id="echo" ${S.settings.echo?"checked":""}><label for="echo">Say each letter as Stoute types</label></span></div>
     </div>
-    <div class="row"><button class="btn" style="--c:var(--rose)" id="saveSet">Save settings</button><button class="btn ghost" id="testVoice">🔊 Test voice</button>
+    <div class="row"><button class="btn" style="--c:var(--rose)" id="saveSet">Save settings</button>
       <button class="btn ghost" id="resetStars">Reset stars</button></div><div id="confirmBox"></div>`);
 }
 function help(){
@@ -654,8 +692,13 @@ const bind={
   rewards(){common();$("#cheer").onclick=()=>speak([...PRAISE,...PERSIST])},
   beryl(){common();
     $("#saveSet").onclick=()=>{S.settings.treat=$("#treat").value||S.settings.treat;S.settings.target=Math.max(5,+$("#target").value||50);
-      S.settings.voice=$("#voiceSel").value;S.settings.rate=+$("#rate").value;S.settings.revDay=+$("#revDay").value;S.settings.echo=$("#echo").checked;save();render();toast("Settings saved")};
-    $("#testVoice").onclick=()=>{S.settings.voice=$("#voiceSel").value;S.settings.rate=+$("#rate").value;speak(`Hello ${NAME}. I am Zulu 1 Ham Dog, your personal tutor.`)};
+      S.settings.rate=+$("#rate").value;S.settings.revDay=+$("#revDay").value;S.settings.echo=$("#echo").checked;save();render();toast("Settings saved")};
+    document.querySelectorAll("[data-sample]").forEach(b=>b.onclick=()=>{const r=+$("#rate").value;
+      if(b.dataset.sample===""){speak(SAMPLE,{rate:r});return}
+      const v=ukVoices()[+b.dataset.sample];if(!v)return;
+      if(!synth)return;synth.cancel();const u=new SpeechSynthesisUtterance(SAMPLE);u.voice=v;u.lang=v.lang;u.rate=r;u.pitch=1;keep.push(u);synth.speak(u)});
+    document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const v=ukVoices()[+b.dataset.use];if(!v)return;
+      S.settings.voice=v.name;save();render();toast(niceName(v.name)+" is now Zulu's voice");speak(`Hello, ${NAME}. This is my new voice.`)});
     $("#resetStars").onclick=()=>confirmBox("Reset Stoute's stars to zero?",()=>{S.stars=0;save();render();toast("Stars reset")});
   },
   help(){common();$("#readHelp").onclick=()=>speak([...document.querySelectorAll("#view .trick")].map(t=>t.innerText.replace(/\n/g,". ")))}
