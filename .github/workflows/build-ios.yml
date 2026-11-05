@@ -1,0 +1,48 @@
+name: Build iOS app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Copy the latest tutor page into the app
+        run: |
+          python3 - <<'PY'
+          s = open('index.html').read()
+          s = s.replace('<meta name="claude:viewport-fit-sides" content="cover">',
+                        '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">', 1)
+          open('ios/Resources/index.html', 'w').write(s)
+          PY
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+      - name: Build (unsigned)
+        run: |
+          xcodebuild -project ios/Zulu1Tutor.xcodeproj -scheme Zulu1Tutor -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+      - name: Package IPA
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/Zulu1Tutor.app Payload/
+          zip -qry Zulu1-HamDog-Tutor.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Zulu1-HamDog-Tutor-ipa
+          path: Zulu1-HamDog-Tutor.ipa
+      - name: Publish as a GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ios-v1.0.${{ github.run_number }}
+          name: Zulu 1 Ham Dog Tutor for iPhone ${{ github.run_number }}
+          files: Zulu1-HamDog-Tutor.ipa
