@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Zulu 1 Ham Dog Tutor</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,6 +24,7 @@
 :root[data-theme="dark"]{ --bg:#141A2E; --surface:#1E2742; --ink:#F6F2E6; --muted:#B7BFD6; --line:#2F3A5C; --dog-light:#E9C595; color-scheme:dark }
 
 *{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 [hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
@@ -193,6 +199,8 @@ details p{margin-top:6px}
 .radio-card .btn{font-size:1.3rem}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <div class="top">
@@ -609,7 +617,7 @@ function setupRound(){
   const w=cur();game.tries=0;game.built="";game.used=[];game.fb=null;
   if(game.type==="scramble"){let s;do{s=shuffle(w.split(""))}while(s.join("")===w&&w.length>1);game.letters=s}
   if(game.type==="missing"){const n=Math.max(1,Math.round(w.length/4));const idx=shuffle([...w.keys()]).slice(0,n);game.mask=w.split("").map((c,i)=>idx.includes(i)?"_":c).join(" ")}
-  setTimeout(()=>{if(game.type==="scramble")speak([`Unscramble the word: ${w}`]);else if(game.type==="missing")speak([`Fill in the missing letters to spell: ${w}`]);else speak([`${NAME}, please spell: ${w}`])},250);
+  setTimeout(()=>{if(!game)return;if(game.type==="scramble")speak([`Unscramble the word: ${w}`]);else if(game.type==="missing")speak([`Fill in the missing letters to spell: ${w}`]);else speak([`${NAME}, please spell: ${w}`])},250);
 }
 function gameBody(){
   if(game.done){
@@ -803,3 +811,5 @@ $("#radioBtn").dataset.next="start";
 render();
 })();
 </script>
+</body>
+</html>

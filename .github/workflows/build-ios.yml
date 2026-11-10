@@ -15,34 +15,34 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install XcodeGen
         run: brew install xcodegen
-      - name: Copy the latest tutor page into the app
+      - name: Copy the latest tutor pages into the apps
         run: |
-          python3 - <<'PY'
-          s = open('index.html').read()
-          s = s.replace('<meta name="claude:viewport-fit-sides" content="cover">',
-                        '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">', 1)
-          open('ios/Resources/index.html', 'w').write(s)
-          PY
+          cp index.html ios/Resources/Shakai/index.html
+          cp bubba/index.html ios/Resources/Bubba/index.html
       - name: Generate Xcode project
         working-directory: ios
         run: xcodegen generate
-      - name: Build (unsigned)
+      - name: Build both apps (unsigned)
         run: |
-          xcodebuild -project ios/Zulu1Tutor.xcodeproj -scheme Zulu1Tutor -configuration Release \
-            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
-      - name: Package IPA
+          for t in Zulu1Tutor Zulu1Bubba; do
+            xcodebuild -project ios/Zulu1Tutor.xcodeproj -scheme "$t" -configuration Release \
+              -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+              CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+          done
+      - name: Package IPAs
         run: |
-          mkdir Payload
-          cp -R build/Build/Products/Release-iphoneos/Zulu1Tutor.app Payload/
-          zip -qry Zulu1-HamDog-Tutor.ipa Payload
+          pack() { rm -rf Payload && mkdir Payload && cp -R "build/Build/Products/Release-iphoneos/$1.app" Payload/ && zip -qry "$2" Payload; }
+          pack Zulu1Tutor Zulu1-HamDog-Tutor.ipa
+          pack Zulu1Bubba Zulu1-Tutor-Bubba.ipa
       - uses: actions/upload-artifact@v4
         with:
-          name: Zulu1-HamDog-Tutor-ipa
-          path: Zulu1-HamDog-Tutor.ipa
+          name: Zulu1-Tutor-ipas
+          path: "*.ipa"
       - name: Publish as a GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ios-v1.0.${{ github.run_number }}
-          name: Zulu 1 Ham Dog Tutor for iPhone ${{ github.run_number }}
-          files: Zulu1-HamDog-Tutor.ipa
+          tag_name: ios-v1.1.${{ github.run_number }}
+          name: Zulu 1 Tutor iPhone ${{ github.run_number }}
+          files: |
+            Zulu1-HamDog-Tutor.ipa
+            Zulu1-Tutor-Bubba.ipa

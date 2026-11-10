@@ -27,3 +27,11 @@ The android folder holds the Android app. When this project is pushed to GitHub,
 GitHub builds the APK automatically (see the Actions tab), and the file
 Zulu1-HamDog-Tutor.apk appears under Releases. Download it on the Android phone and
 tap it to install (allow "Install unknown apps" for the browser when asked).
+
+TWO STUDENTS
+- index.html: Master Shakai Stoute's tutor.
+- bubba/index.html: Master Bubba's tutor (Year 7 & 8, Key Stage 3). It adds subject word packs
+  (Tricky Spellings, English, Maths, Science, History, Geography) with meanings, word-building tips
+  (prefixes, roots, suffixes), meanings in the Spelling Bee, and a Meaning Match game.
+  It is generated from index.html, so changes to the main tutor can be carried over.
+Each student has a separate Android app, iPhone app and Windows package, with separate saved progress.

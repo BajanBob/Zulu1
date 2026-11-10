@@ -22,20 +22,26 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.14.3"
-      - name: Copy the latest tutor page into the app
-        run: cp index.html android/app/src/main/assets/index.html
-      - name: Build APK
+      - name: Copy the latest tutor pages into the apps
+        run: |
+          cp index.html android/app/src/shakai/assets/index.html
+          cp bubba/index.html android/app/src/bubba/assets/index.html
+      - name: Build both APKs
         working-directory: android
-        run: gradle assembleDebug --no-daemon
-      - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Zulu1-HamDog-Tutor.apk
+        run: gradle assembleShakaiDebug assembleBubbaDebug --no-daemon
+      - name: Rename APKs
+        run: |
+          cp android/app/build/outputs/apk/shakai/debug/app-shakai-debug.apk Zulu1-HamDog-Tutor.apk
+          cp android/app/build/outputs/apk/bubba/debug/app-bubba-debug.apk Zulu1-Tutor-Bubba.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Zulu1-HamDog-Tutor-apk
-          path: Zulu1-HamDog-Tutor.apk
+          name: Zulu1-Tutor-apks
+          path: "*.apk"
       - name: Publish as a GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Zulu 1 Ham Dog Tutor ${{ github.run_number }}
-          files: Zulu1-HamDog-Tutor.apk
+          tag_name: v1.1.${{ github.run_number }}
+          name: Zulu 1 Tutor Android ${{ github.run_number }}
+          files: |
+            Zulu1-HamDog-Tutor.apk
+            Zulu1-Tutor-Bubba.apk
