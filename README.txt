@@ -35,3 +35,10 @@ TWO STUDENTS
   (prefixes, roots, suffixes), meanings in the Spelling Bee, and a Meaning Match game.
   It is generated from index.html, so changes to the main tutor can be carried over.
 Each student has a separate Android app, iPhone app and Windows package, with separate saved progress.
+
+IPHONE SAFARI (website)
+Once GitHub Pages is on (Settings > Pages > Branch: gh-pages, / (root)), the tutors are at:
+  Master Shakai Stoute: https://bajanbob.github.io/Zulu1/
+  Master Bubba:         https://bajanbob.github.io/Zulu1/bubba/
+Open the link in Safari, tap Share, then "Add to Home Screen" for a puppy icon.
+The website updates by itself every time a change is pushed.

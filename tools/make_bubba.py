@@ -19,6 +19,8 @@ s = s.replace("Master Shakai Stoute", "Master Bubba").replace("Stoute", "Bubba")
 rep('<small>Personal tutor of Master Bubba</small>',
     '<small>Personal tutor of Master Bubba · Year 7 &amp; 8</small>')
 rep('<title>Zulu 1 Ham Dog Tutor</title>', "<title>Bubba's Zulu 1 Tutor</title>")
+rep('<meta name="apple-mobile-web-app-title" content="Zulu 1 Tutor">', '<meta name="apple-mobile-web-app-title" content="Zulu 1 Bubba">')
+rep('<link rel="apple-touch-icon" href="apple-touch-icon.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">')
 rep('const KEY="zulu1-tutor-v1";', 'const KEY="zulu1-bubba-ks3-v1";')
 rep('treat:"A trip to the beach with Granny Beryl"', 'treat:"A special treat from Granny Beryl"')
 

@@ -1,0 +1,26 @@
+name: Publish website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  site:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Put the tutors on the gh-pages branch
+        run: |
+          mkdir -p site/bubba
+          cp index.html apple-touch-icon.png site/
+          cp bubba/index.html site/bubba/index.html
+          touch site/.nojekyll
+          cd site
+          git init -q -b gh-pages
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -qm "Publish tutors from ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
