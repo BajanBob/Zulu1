@@ -12,12 +12,12 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Andika:wght@400;700&display=swap">
 <style>
 /* Layout: one column "classroom by the sea" — mascot bubble on top, big coloured section tiles, one active panel */
 :root{
   --bg:#FFF8E6; --surface:#FFFFFF; --ink:#1F2A44; --muted:#5B6683; --line:#F0DFB8;
-  --sea:#14B8C4; --sun:#FFC328; --coral:#FF6B5B; --leaf:#3DBE6A; --grape:#8E5CF0; --tang:#FF9A1F; --rose:#F25CA8; --sky:#3F8CFF;
+  --sea:#14B8C4; --sun:#FFC328; --coral:#FF6B5B; --leaf:#3DBE6A; --grape:#8E5CF0; --tang:#FF9A1F; --rose:#F25CA8; --sky:#3F8CFF; --mint:#12A58C;
   --dog:#B9763F; --dog-dark:#7A4A23; --dog-light:#F3D2A8;
   --good:#1E9E55; --bad:#D9443A;
   --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
@@ -74,8 +74,9 @@ button{cursor:pointer}
 @media (max-width:480px){.dog{width:100px;height:100px}.bubble{font-size:1rem}}
 
 /* Big colourful nav */
-.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media (max-width:620px){.nav{grid-template-columns:repeat(4,1fr);gap:8px}}
+.nav{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px}
+.nav .tile{font-size:.92rem}
+@media (max-width:760px){.nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nav .tile{font-size:1rem}}
 .tile{--c:var(--sea);border:0;border-radius:18px;background:var(--c);color:#fff;padding:10px 4px 8px;
   display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--display);font-weight:800;font-size:1rem;
   box-shadow:0 5px 0 color-mix(in srgb,var(--c) 70%,#000);transition:transform .1s}
@@ -190,6 +191,44 @@ details p{margin-top:6px}
 .dchip{border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:700;font-size:1rem}
 .dchip.on{background:var(--bad);border-color:var(--bad);color:#fff}
 .wkwords{min-width:0;display:flex;flex-direction:column;gap:8px}
+/* Writing module */
+.pchip{border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:700;font-size:1rem}
+.pchip.on{background:var(--mint);border-color:var(--mint);color:#fff}
+.wtabs{display:flex;flex-wrap:wrap;gap:8px}
+.wtab{border:3px solid var(--mint);background:var(--surface);color:var(--ink);border-radius:14px;padding:8px 14px;font-family:var(--display);font-weight:800;font-size:1.05rem}
+.wtab.on{background:var(--mint);color:#fff}
+.abc{display:flex;flex-wrap:wrap;gap:6px}
+.ab{width:44px;height:48px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-family:"Andika",var(--body);font-size:1.5rem;font-weight:700}
+.ab.on{background:var(--mint);border-color:var(--mint);color:#fff}
+.wgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:640px){.wgrid{grid-template-columns:1fr}}
+.pad{position:relative;width:100%;max-width:440px;aspect-ratio:100/115;background:#FFFDF6;border:4px solid var(--mint);border-radius:20px;overflow:hidden;justify-self:center;touch-action:none}
+.pad svg,.pad canvas{position:absolute;inset:0;width:100%;height:100%}
+.pad canvas{touch-action:none;cursor:crosshair}
+.gl{stroke:#9DB7D5;stroke-width:.6}.gl.dash{stroke-dasharray:2 2}.gl.base{stroke:#E0526A;stroke-width:.9}
+.road{fill:none;stroke:#D9DEE8;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.demo{fill:none;stroke:#F25CA8;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.sdot{fill:#1E9E55}.snum{fill:#fff;font:700 5px sans-serif;text-anchor:middle}
+.wside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.bigl{display:flex;align-items:center;gap:14px;font-family:"Andika",var(--body);font-size:5rem;line-height:1;color:var(--mint);font-weight:700}
+.bigl .emo,.lcard .emo{font-family:system-ui,sans-serif}
+.bigl .emo{font-size:3rem}
+.wtip{font-size:1.1rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.lcard{--c:var(--sea);border:3px solid var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface));color:var(--ink);border-radius:18px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.lcard b{font-family:"Andika",var(--body);font-size:1.9rem;color:color-mix(in srgb,var(--c) 75%,var(--ink))}
+.lcard .emo{font-size:1.8rem}.lcard small{font-weight:700;color:var(--muted)}
+.wltiles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.wlt{--c:var(--sea);width:72px;border:0;border-radius:16px;background:var(--c);color:#fff;padding:8px 0;display:flex;flex-direction:column;align-items:center;box-shadow:0 4px 0 color-mix(in srgb,var(--c) 68%,#000);transition:transform .15s}
+.wlt b{font-family:"Andika",var(--body);font-size:2.6rem;line-height:1.1}
+.wlt span{font-size:1.4rem}
+.wlt.now{transform:translateY(-8px) scale(1.12);outline:4px solid var(--ink);outline-offset:2px}
+.grownups{border:3px solid var(--leaf);border-radius:18px;padding:12px 16px;background:color-mix(in srgb,var(--leaf) 8%,var(--surface))}
+.grownups summary{cursor:pointer;font-size:1.05rem}
+.gu{display:flex;flex-direction:column;gap:10px;margin-top:10px;max-width:68ch}
+.gu h4{margin:6px 0 0;font-family:var(--display);font-size:1.1rem;color:color-mix(in srgb,var(--leaf) 70%,var(--ink))}
+.gu ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px}
+.gu a{color:var(--sky)}
 /* Radio signature call */
 .radio{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;
   background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);
@@ -252,6 +291,7 @@ details p{margin-top:6px}
     <button class="tile" style="--c:var(--sea)" data-view="home"><span class="ic">🏠</span>Home</button>
     <button class="tile" style="--c:var(--coral)" data-view="words"><span class="ic">✏️</span>My Words</button>
     <button class="tile" style="--c:var(--tang)" data-view="learn"><span class="ic">💡</span>Learn</button>
+    <button class="tile" style="--c:var(--mint)" data-view="writing"><span class="ic">✍️</span>Writing</button>
     <button class="tile" style="--c:var(--leaf)" data-view="games"><span class="ic">🎮</span>Games</button>
     <button class="tile" style="--c:var(--grape)" data-view="revision"><span class="ic">📚</span>Revision</button>
     <button class="tile" style="--c:var(--sun);color:#3B2A00" data-view="rewards"><span class="ic">⭐</span>Rewards</button>
@@ -299,7 +339,7 @@ const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Satur
 /* ---------- storage ---------- */
 const KEY="zulu1-tutor-v1";
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.weeks)return s}catch(e){}return null}
-let S = load() || {stars:0, weeks:{}, settings:{treat:"A trip to the beach with Granny Beryl", target:50, echo:true, rate:0.9, voice:"", revDay:5}, revisions:[], treatsClaimed:0};
+let S = load() || {stars:0, weeks:{}, settings:{treat:"A trip to the beach with Granny Beryl", target:50, echo:true, rate:0.85, voice:"", revDay:5}, revisions:[], treatsClaimed:0};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 function weekKey(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);
@@ -359,9 +399,14 @@ function unlockSpeech(){
   if(!synth)return;
   try{synth.cancel();synth.resume();const u=new SpeechSynthesisUtterance(" ");u.volume=0;u.lang="en-GB";keep.push(u);synth.speak(u)}catch(e){}
 }
+/* Standard English, spoken clearly: each sentence becomes its own utterance, so the voice
+   pauses between sentences instead of running them together. */
+function clauses(parts){const out=[];(Array.isArray(parts)?parts:[parts]).forEach(t=>{
+  const m=String(t).match(/[^.!?]+[.!?]*/g);(m||[String(t)]).forEach(x=>{x=x.trim();if(x)out.push(x)})});return out.length?out:[""]}
 function speak(parts,{cancel=true,rate,onend}={}){
+  parts=clauses(parts);
   if(window.AndroidTTS){
-    const list=Array.isArray(parts)?parts:[parts];
+    const list=parts;
     list.forEach((t,i)=>{const id="u"+(++ttsN);
       if(onend&&i===list.length-1){ttsCb[id]=onend;setTimeout(()=>window.__ttsDone(id),4000+t.length*120)}
       try{AndroidTTS.speak(sayable(t),rate||S.settings.rate,cancel&&i===0,id)}catch(e){window.__ttsDone(id)}});
@@ -370,16 +415,19 @@ function speak(parts,{cancel=true,rate,onend}={}){
   if(!synth){onend&&onend();return}
   if(cancel&&(synth.speaking||synth.pending))synth.cancel();
   try{synth.resume()}catch(e){}
-  const v=pickVoice(),list=Array.isArray(parts)?parts:[parts];
-  if(keep.length>20)keep.splice(0,keep.length-20);
+  const v=pickVoice(),list=parts;
+  if(keep.length>60)keep.splice(0,keep.length-60);
   list.forEach((t,i)=>{
     const u=new SpeechSynthesisUtterance(sayable(t));keep.push(u);
-    if(v)u.voice=v; u.lang=v?v.lang:"en-GB"; u.rate=rate||S.settings.rate; u.pitch=1;
+    if(v)u.voice=v; u.lang="en-GB"; u.rate=rate||S.settings.rate; u.pitch=1;
     if(onend&&i===list.length-1){let fired=false;const f=()=>{if(!fired){fired=true;onend()}};u.onend=f;u.onerror=f;setTimeout(f,4000+t.length*120)}
     synth.speak(u);
   });
 }
-const spellOut=w=>w.toUpperCase().split("").join(", ");
+/* British letter names, so Z is "zed" and H is "aitch" even on a voice that would say "zee" */
+const LETTER_SAY={h:"Aitch",z:"Zed"};
+const letterName=c=>LETTER_SAY[String(c).toLowerCase()]||String(c).toUpperCase();
+const spellOut=w=>String(w).split("").filter(c=>/[a-z]/i.test(c)).map(letterName).join(". ");
 
 /* ---------- sounds ---------- */
 let actx;
@@ -479,14 +527,14 @@ function onEnter(v){
   const lines={home:`Welcome back, ${NAME}! I am Zulu 1, your personal tutor.`,words:`${NAME}, type the words you need to learn this week.`,
     learn:`Let us learn together, ${NAME}. Tap a word to hear it.`,games:`Game time, ${NAME}! Pick a game and win stars.`,
     revision:`${NAME}, this is revision. We go over everything you learned this week.`,rewards:`Look at all your stars, ${NAME}!`,
-    beryl:`This is Granny Beryl's corner.`,help:`Here is how to use me, ${NAME}.`};
+    beryl:`This is Granny Beryl's corner.`,writing:`Let us practise writing and hearing our letters, ${NAME}.`,help:`Here is how to use me, ${NAME}.`};
   say(lines[v]||"",{voice:true});
 }
 
 function render(){
   document.querySelectorAll(".tile").forEach(b=>b.setAttribute("aria-current",b.dataset.view===view?"page":"false"));
   $("#starCount").textContent=S.stars;
-  const V={home,wordsView,learn,games,revision,rewards,beryl,help}[view==="words"?"wordsView":view];
+  const V={home,wordsView,learn,games,revision,rewards,beryl,help,writing}[view==="words"?"wordsView":view];
   $("#view").innerHTML=V();
   bind[view]&&bind[view]();
 }
@@ -536,7 +584,8 @@ function learn(){
       <button class="btn" style="--c:var(--sea)" id="sayW">🔊 Say it</button>
       <button class="btn" style="--c:var(--grape)" id="slowW">🐢 Slowly</button>
       <button class="btn" style="--c:var(--leaf)" id="spellW">🔤 Spell it</button>
-      <button class="btn" style="--c:var(--coral)" id="chunkW">👏 Clap chunks</button></div>
+      <button class="btn" style="--c:var(--coral)" id="chunkW">👏 Clap chunks</button>
+      <button class="btn" style="--c:var(--mint)" id="lettersW">🐣 Letter by letter</button></div>
     <div class="chunks">${ch.map((c,i)=>`<span style="background:${COLORS[(i+2)%COLORS.length]}">${esc(c)}</span>`).join("")}</div>
     <div class="tricks">
       <div class="trick" style="--c:var(--grape)"><h3>🧠 Memory tricks</h3>${tricks(word).map(t=>`<p>${t}</p>`).join("")}</div>
@@ -604,6 +653,29 @@ function beryl(){
     :`<p class="hint">${synth?"Voices are still loading. Open this section again in a moment.":"This device does not offer spoken voices. Try Chrome, Safari or Edge."}</p>`;
   return panel("var(--rose)","Granny Beryl's Corner",`
     <p class="hint">Settings for Granny Beryl. Set the treat, choose the voice, and pick revision day.</p>
+    <details class="grownups">
+      <summary><b>🌱 A quiet word for grown-ups</b><span class="hint"> · screens, handwriting and learning</span></summary>
+      <div class="gu">
+        <p>Zulu is here to help, but the best learning still happens with a pencil in hand and a grown-up close by. Here is what the research says, gently put.</p>
+        <h4>✏️ Writing by hand helps letters stick</h4>
+        <p>In a French study, children aged 3 to 5 copied letters for three weeks, either by hand or on a keyboard. The older children who wrote by hand recognised the letters better afterwards (<a href="https://doi.org/10.1016/j.actpsy.2004.10.019" target="_blank" rel="noopener">Longcamp and colleagues, 2005</a>). In brain scans of 4 and 5 year olds, practising letters by hand, more than typing or tracing, engaged the brain areas used later for reading (<a href="https://doi.org/10.1016/j.tine.2012.08.001" target="_blank" rel="noopener">James and Engelhardt, 2012</a>). A Norwegian study found wider brain activity when young adults wrote by hand than when they typed (<a href="https://doi.org/10.3389/fpsyg.2023.1219945" target="_blank" rel="noopener">Van der Weel and Van der Meer, 2024</a>), although other researchers have questioned how far that result goes (<a href="https://doi.org/10.3389/fpsyg.2024.1517235" target="_blank" rel="noopener">Pinet and Longcamp, 2025</a>).</p>
+        <h4>⏳ How much screen time</h4>
+        <p>The World Health Organization advises no sitting screen time for 1 year olds, and no more than 1 hour a day for children aged 2 to 4, with "less is better". It encourages reading and storytelling with a grown-up instead (<a href="https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more" target="_blank" rel="noopener">WHO, 2019</a>). A Canadian study of 2,441 children found that more screen time at ages 2 and 3 went with lower scores on development checks at ages 3 and 5. The differences were small on average, but they appeared after the screen time, not before it (<a href="https://doi.org/10.1001/jamapediatrics.2018.5056" target="_blank" rel="noopener">Madigan and colleagues, 2019</a>).</p>
+        <h4>🎁 Why slower learning can feel dull</h4>
+        <p>Many children's apps are built to hold attention. A study of apps used by 3 to 5 year olds found that four in five used tricks to keep children playing, such as stickers and trophies for coming back. Parents said children often refused to hand the device back at dinner or bedtime (<a href="https://doi.org/10.1001/jamanetworkopen.2022.1764" target="_blank" rel="noopener">Radesky and colleagues, 2022</a>). After a stream of quick rewards, a book or a page of handwriting can seem slow. Zulu gives stars too, so keep sessions short and let the real prize be your praise.</p>
+        <h4>📱 Older children and phones</h4>
+        <p>In the 2022 international PISA tests of 15 year olds, 65% said they were distracted by digital devices in at least some maths lessons. Those distracted by classmates' devices scored 15 points lower in maths. Students who used devices for fun at school for up to an hour a day scored 49 points higher than those who used them for 5 to 7 hours (<a href="https://www.oecd.org/en/about/news/press-releases/2023/12/decline-in-educational-performance-only-partly-attributable-to-the-covid-19-pandemic.html" target="_blank" rel="noopener">OECD, 2023</a>).</p>
+        <h4>💛 Small things that help</h4>
+        <ul>
+          <li>Keep each Zulu session to about 10 to 15 minutes. Zulu will suggest a pencil-and-paper break.</li>
+          <li>After tracing a letter here, write it three times on paper with a real pencil.</li>
+          <li>Sit together when you can. Say the words aloud and talk about what they mean.</li>
+          <li>Read a book together every day. It counts for more than any app.</li>
+          <li>Praise effort, not just stars: "You kept trying. That is how you learn."</li>
+        </ul>
+        <p class="hint">This is general information from published research, not medical advice. Every child is different. If you are worried about your child's development, speak to their teacher or doctor.</p>
+      </div>
+    </details>
     <div class="trick" style="--c:var(--sea)"><h3>🎙️ Voice samples</h3>
       <p class="hint">Play each voice and choose the one that sounds most natural. Voices marked ✨ Natural sound the most like a real person.</p>
       <div class="vlist">${samples}</div>
@@ -617,6 +689,7 @@ function beryl(){
       <div class="set"><label for="target">Stars needed for the treat</label><input id="target" class="field" type="number" min="5" max="1000" value="${S.settings.target}"></div>
       <div class="set"><label for="rate">Speaking speed</label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="${S.settings.rate}"><small class="hint">Middle is the most natural.</small></div>
       <div class="set"><label for="revDay">Revision day</label><select id="revDay" class="field">${DAYS.map((d,i)=>`<option value="${i}" ${S.settings.revDay==i?"selected":""}>${d}</option>`).join("")}</select></div>
+      <div class="set"><label for="breakMin">Suggest a pencil-and-paper break after</label><select id="breakMin" class="field">${[0,10,15,20,30].map(m=>`<option value="${m}" ${(S.settings.breakMin??15)==m?"selected":""}>${m?m+" minutes":"Never"}</option>`).join("")}</select></div>
       <div class="set"><span class="switch"><input type="checkbox" id="echo" ${S.settings.echo?"checked":""}><label for="echo">Say each letter as Stoute types</label></span></div>
     </div>
     <div class="row"><button class="btn" style="--c:var(--rose)" id="saveSet">Save settings</button>
@@ -628,11 +701,165 @@ function help(){
       <div class="trick" style="--c:var(--coral)"><h3>1. ✏️ My Words</h3><p>Each week, type the new spelling words and tap <b>Add words</b>. Tap 🗑️ on a word to delete it, or <b>Delete words</b> to remove several. Made a mistake? Tap <b>Undo</b>.</p></div>
       <div class="trick" style="--c:var(--tang)"><h3>2. 💡 Learn</h3><p>Hear each word, clap the chunks, and read the memory tricks and silly stories.</p></div>
       <div class="trick" style="--c:var(--leaf)"><h3>3. 🎮 Games</h3><p>Play Spelling Bee, Unscramble and Missing Letters. Zulu says each letter you type and reads back your answer.</p></div>
+      <div class="trick" style="--c:var(--mint)"><h3>✍️ Writing</h3><p>Trace letters on the handwriting lines. Tap <b>Show me</b> to watch how each letter is formed, then trace it and tap <b>I'm done</b>. <b>Letter sounds</b> says each letter's name and sound.</p></div>
       <div class="trick" style="--c:var(--grape)"><h3>4. 📚 Revision</h3><p>At the end of the week, recap every word and take the revision test for a certificate.</p></div>
       <div class="trick" style="--c:var(--sun)"><h3>5. ⭐ Rewards</h3><p>Collect stars, win badges, and earn Granny Beryl's treat.</p></div>
       <div class="trick" style="--c:var(--sea)"><h3>📻 Signature call</h3><p>Every session starts with Zulu's Morse code call sign, Z U L U 1, and "This is Zulu one calling Master Shakai Stoute". Tap <b>End session</b> to hear the call sign and "Zulu one out".</p></div>
       <div class="trick" style="--c:var(--rose)"><h3>Sound tip</h3><p>Turn the volume up. Tap any 🔊 button to hear Zulu. Your progress stays saved on this device.</p></div>
     </div><button class="btn big" style="--c:var(--sky)" id="readHelp">🔊 Read this to me</button>`);
+}
+
+
+/* ---------- Writing: forming letters, and hearing letters ----------
+   Letters sit on four lines like a UK handwriting book, in a 100 x 115 box:
+   top line y=10, middle line y=45, base line y=80, tail line y=105.
+   Each letter is a list of strokes (SVG paths) drawn in order. */
+const C_SHAPE="M66,50 C60,43 44,43 37,52 C31,60 32,72 39,78 C46,83 60,82 66,74";
+const BOWL="L35,62 C35,52 42,45 51,45 C61,45 67,53 67,62 C67,73 60,80 51,80 C43,80 36,75 35,68";
+const HUMP="C38,48 45,45 50,45 C58,45 65,50 65,60 L65,80";
+const STROKES={
+ a:[C_SHAPE,"M67,45 L67,80"], b:["M35,10 L35,80 "+BOWL], c:[C_SHAPE], d:[C_SHAPE,"M67,10 L67,80"],
+ e:["M34,63 L67,63 C67,50 58,45 50,45 C40,45 33,53 33,63 C33,74 41,80 51,80 C58,80 63,77 66,73"],
+ f:["M64,16 C60,10 50,9 46,15 C44,19 44,24 44,30 L44,80","M34,45 L58,45"], g:[C_SHAPE,"M67,45 L67,98 C67,110 45,110 38,102"],
+ h:["M35,10 L35,80 L35,58 "+HUMP], i:["M50,45 L50,80","M50,30 L50,31"], j:["M55,45 L55,98 C55,108 42,108 38,100","M55,30 L55,31"],
+ k:["M37,10 L37,80","M62,45 L37,66 L63,80"], l:["M50,10 L50,80"],
+ m:["M28,45 L28,80 L28,57 C30,48 36,45 40,45 C46,45 50,50 50,58 L50,80 L50,57 C52,48 58,45 62,45 C68,45 72,50 72,58 L72,80"],
+ n:["M35,45 L35,80 L35,58 "+HUMP], o:["M66,50 C60,43 44,43 37,52 C31,60 32,72 39,78 C46,83 60,83 65,76 C70,68 70,56 66,50"],
+ p:["M35,45 L35,105 "+BOWL], q:[C_SHAPE,"M67,45 L67,105"], r:["M38,45 L38,80 L38,60 C40,50 50,44 62,47"],
+ s:["M64,50 C60,45 52,44 46,45 C38,47 36,55 42,59 C48,63 60,62 64,68 C68,75 60,81 50,80 C43,80 37,78 35,74"],
+ t:["M47,22 L47,74 C47,80 55,82 60,78","M37,45 L60,45"], u:["M35,45 L35,68 C35,77 41,80 49,80 C57,80 65,75 65,65 L65,45 L65,80"],
+ v:["M33,45 L50,80 L67,45"], w:["M25,45 L37,80 L50,52 L63,80 L75,45"], x:["M35,45 L65,80","M65,45 L35,80"],
+ y:["M35,45 L35,66 C35,76 42,80 49,80 C57,80 65,75 65,66 L65,45 L65,98 C65,108 48,110 40,102"], z:["M35,45 L65,45 L35,80 L65,80"],
+ A:["M50,10 L30,80","M50,10 L70,80","M37,56 L63,56"],
+ B:["M33,10 L33,80","M33,10 L52,10 C62,10 66,17 66,26 C66,35 60,43 52,43 L33,43","M52,43 C64,43 70,51 70,61 C70,72 62,80 52,80 L33,80"],
+ C:["M68,22 C62,12 54,10 49,10 C36,10 30,25 30,45 C30,65 36,80 49,80 C56,80 63,76 68,68"],
+ D:["M33,10 L33,80","M33,10 L48,10 C62,10 70,25 70,45 C70,65 62,80 48,80 L33,80"],
+ E:["M35,10 L35,80","M35,10 L65,10","M35,45 L60,45","M35,80 L65,80"], F:["M35,10 L35,80","M35,10 L65,10","M35,45 L60,45"],
+ G:["M68,22 C62,12 54,10 49,10 C36,10 30,25 30,45 C30,65 36,80 49,80 C56,80 63,76 68,68 L68,50 L54,50"],
+ H:["M33,10 L33,80","M67,10 L67,80","M33,45 L67,45"], I:["M50,10 L50,80","M38,10 L62,10","M38,80 L62,80"],
+ J:["M60,10 L60,64 C60,76 54,80 47,80 C40,80 36,76 34,70"], K:["M35,10 L35,80","M66,10 L35,52","M46,40 L67,80"],
+ L:["M35,10 L35,80 L65,80"], M:["M28,80 L28,10 L50,52 L72,10 L72,80"], N:["M32,80 L32,10 L68,80 L68,10"],
+ O:["M50,10 C36,10 30,26 30,45 C30,64 36,80 50,80 C64,80 70,64 70,45 C70,26 64,10 50,10"],
+ P:["M33,10 L33,80","M33,10 L52,10 C63,10 68,18 68,28 C68,38 62,46 52,46 L33,46"],
+ Q:["M50,10 C36,10 30,26 30,45 C30,64 36,80 50,80 C64,80 70,64 70,45 C70,26 64,10 50,10","M55,64 L72,84"],
+ R:["M33,10 L33,80","M33,10 L52,10 C63,10 68,18 68,28 C68,38 62,46 52,46 L33,46","M50,46 L68,80"],
+ S:["M66,20 C61,12 55,10 49,10 C39,10 32,16 32,26 C32,36 42,40 50,44 C59,48 68,52 68,63 C68,74 60,80 50,80 C42,80 35,77 31,69"],
+ T:["M50,10 L50,80","M30,10 L70,10"], U:["M32,10 L32,58 C32,72 40,80 50,80 C60,80 68,72 68,58 L68,10"],
+ V:["M30,10 L50,80 L70,10"], W:["M24,10 L36,80 L50,32 L64,80 L76,10"], X:["M32,10 L68,80","M68,10 L32,80"],
+ Y:["M32,10 L50,45 L50,80","M68,10 L50,45"], Z:["M32,10 L68,10 L32,80 L68,80"]
+};
+/* UK letter families and a spoken tip for each small letter */
+const TIP={
+ a:"Curly caterpillar letter. Go round like a c, then up and down.", b:"Ladder letter. Down the long ladder, back up, and round.",
+ c:"Curly caterpillar letter. Start at the top and curl round.", d:"Curly caterpillar letter. Round like a c, up tall, then down.",
+ e:"Curly caterpillar letter. Go across the middle, then curl round.", f:"Curly caterpillar letter. Over the top, down, then cross it.",
+ g:"Curly caterpillar letter. Round like a c, up, then down under the line and hook.", h:"One-armed robot letter. Down tall, back up, and over the hump.",
+ i:"Ladder letter. Go down, then add the dot.", j:"Ladder letter. Down below the line, hook, then add the dot.",
+ k:"One-armed robot letter. Down tall, then in and out.", l:"Ladder letter. Start at the top and go straight down.",
+ m:"One-armed robot letter. Down, up and over, up and over again.", n:"One-armed robot letter. Down, back up, and over.",
+ o:"Curly caterpillar letter. Start at the top and go all the way round.", p:"One-armed robot letter. Down under the line, back up, and round.",
+ q:"Curly caterpillar letter. Round like a c, up, then straight down under the line.", r:"One-armed robot letter. Down, back up, and over a little.",
+ s:"Curly caterpillar letter. Curl back, then forward, like a snake.", t:"Ladder letter. Down and flick, then cross it.",
+ u:"Ladder letter. Down, round, up, and down.", v:"Zigzag monster letter. Down to the line and back up.",
+ w:"Zigzag monster letter. Down, up, down, up.", x:"Zigzag monster letter. One line down this way, one line down that way.",
+ y:"Ladder letter. Down, round, up, then down under the line and hook.", z:"Zigzag monster letter. Across, down to the corner, and across."
+};
+/* Letter sounds: B says buh, B is for ball. Vowels and long sounds are taught by their word. */
+const PHONICS={a:["","apple","🍎"],b:["buh","ball","⚽"],c:["kuh","cat","🐱"],d:["duh","dog","🐶"],e:["","egg","🥚"],f:["","fish","🐟"],
+ g:["guh","goat","🐐"],h:["huh","hat","🎩"],i:["","insect","🐞"],j:["juh","jet","✈️"],k:["kuh","kite","🪁"],l:["","lion","🦁"],
+ m:["","moon","🌙"],n:["","net","🥅"],o:["","octopus","🐙"],p:["puh","pig","🐷"],q:["kwuh","queen","👑"],r:["","rabbit","🐰"],
+ s:["","sun","☀️"],t:["tuh","tiger","🐯"],u:["","umbrella","☂️"],v:["","van","🚐"],w:["wuh","web","🕸️"],x:["","box","📦"],
+ y:["yuh","yellow","💛"],z:["","zebra","🦓"]};
+function letterLines(c){const l=c.toLowerCase(),U=letterName(l),[snd,word]=PHONICS[l]||["",""];
+  return [`${U}.`,...(snd?[`${U} says ${snd}.`]:[]),word?(l==="x"?`${U} is at the end of ${word}.`:`${U} is for ${word}.`):""].filter(Boolean)}
+const WR={mode:"write",upper:false,letter:"a",word:null,ink:[],active:-1};
+const ABC="abcdefghijklmnopqrstuvwxyz".split("");
+function sayLetters(word,i=0){const w=String(word).toLowerCase().replace(/[^a-z]/g,"");
+  if(i>=w.length){WR.active=-1;paintActive();speak([`${w.split("").map(letterName).join(". ")}.`,`That spells ${w}.`],{cancel:false});return}
+  WR.active=i;paintActive();speak(letterLines(w[i]),{cancel:i===0,rate:Math.min(S.settings.rate,.85),onend:()=>{if(view==="writing"&&WR.word===word)sayLetters(word,i+1)}})}
+function paintActive(){document.querySelectorAll("[data-wl]").forEach(b=>b.classList.toggle("now",+b.dataset.wl===WR.active))}
+
+function writing(){
+  const tabs=`<div class="wtabs" role="tablist">
+    <button class="wtab ${WR.mode==="write"?"on":""}" data-wmode="write">✍️ Write letters</button>
+    <button class="wtab ${WR.mode==="abc"?"on":""}" data-wmode="abc">🔤 Letter sounds</button>
+    <button class="wtab ${WR.mode==="words"?"on":""}" data-wmode="words">🐣 Letters in my words</button></div>`;
+  let body="";
+  if(WR.mode==="write"){
+    const L=WR.upper?WR.letter.toUpperCase():WR.letter, strokes=STROKES[L]||[], ph=PHONICS[WR.letter]||["","",""];
+    const tip=WR.upper?`Capital ${letterName(L)} has ${strokes.length} stroke${strokes.length>1?"s":""}. Start at the green dot and follow the numbers.`:TIP[WR.letter];
+    body=`<div class="row"><button class="wtab ${WR.upper?"":"on"}" data-case="lower">abc small letters</button><button class="wtab ${WR.upper?"on":""}" data-case="upper">ABC capital letters</button></div>
+    <div class="abc">${ABC.map(c=>`<button class="ab ${c===WR.letter?"on":""}" data-wletter="${c}" aria-label="Letter ${letterName(c)}">${WR.upper?c.toUpperCase():c}</button>`).join("")}</div>
+    <div class="wgrid">
+      <div class="pad" id="pad">
+        <svg viewBox="0 0 100 115" aria-hidden="true">
+          <line x1="2" x2="98" y1="10" y2="10" class="gl"/><line x1="2" x2="98" y1="45" y2="45" class="gl dash"/>
+          <line x1="2" x2="98" y1="80" y2="80" class="gl base"/><line x1="2" x2="98" y1="105" y2="105" class="gl dash"/>
+          ${strokes.map(d=>`<path d="${d}" class="road"/>`).join("")}
+          ${strokes.map((d,i)=>`<path d="${d}" class="demo" data-demo="${i}"/>`).join("")}
+          <g id="dots"></g>
+        </svg>
+        <canvas id="ink" aria-label="Writing pad. Trace the letter here."></canvas>
+      </div>
+      <div class="wside">
+        <div class="bigl"><span>${esc(L)}</span><span class="emo">${ph[2]}</span></div>
+        <p class="wtip"><b>How to write it:</b> ${esc(tip)}</p>
+        <div class="row"><button class="btn" style="--c:var(--mint)" id="showMe">▶ Show me</button><button class="btn" style="--c:var(--sea)" id="hearL">🔊 Hear it</button></div>
+        <div class="row"><button class="btn ghost" id="clearInk">🧽 Clear</button><button class="btn big" style="--c:var(--leaf)" id="doneInk">✅ I'm done</button></div>
+        <div class="row"><button class="btn ghost" id="prevL" aria-label="Previous letter">◀</button><button class="btn ghost" id="nextL" aria-label="Next letter">Next letter ▶</button></div>
+        <div id="wfb" aria-live="polite"></div>
+      </div>
+    </div>`;
+  }else if(WR.mode==="abc"){
+    body=`<p class="hint">Tap a letter to hear its name, its sound and a word that starts with it.</p>
+    <div class="cards">${ABC.map((c,i)=>`<button class="lcard" style="--c:${COLORS[i%COLORS.length]}" data-say-letter="${c}"><b>${c.toUpperCase()}${c}</b><span class="emo">${PHONICS[c][2]}</span><small>${PHONICS[c][1]}</small></button>`).join("")}</div>
+    <button class="btn big" style="--c:var(--mint)" id="singABC">🎵 Say the whole alphabet</button>`;
+  }else{
+    const w=words();if(!WR.word||!w.includes(WR.word))WR.word=w[0];
+    const ww=WR.word.toLowerCase().replace(/[^a-z]/g,"");
+    body=`<p class="hint">Pick a word. Zulu says each letter, its sound, and a word that starts with it. Tap any letter to hear it again.</p>
+    <div class="chips">${w.map((x,i)=>`<button class="pchip ${x===WR.word?"on":""}" data-wword="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+    <div class="wltiles">${ww.split("").map((c,i)=>`<button class="wlt" style="--c:${COLORS[i%COLORS.length]}" data-wl="${i}"><b>${c}</b><span>${(PHONICS[c]||["","",""])[2]}</span></button>`).join("")}</div>
+    <div class="row" style="justify-content:center"><button class="btn big" style="--c:var(--mint)" id="soundOut">▶ Letter by letter</button>
+    <button class="btn" style="--c:var(--sea)" id="sayWord">🔊 Say the word</button><button class="btn ghost" id="writeFirst">✍️ Write the first letter</button></div>`;
+  }
+  return panel("var(--mint)","Writing &amp; Letter Sounds",tabs+body);
+}
+
+/* the writing pad: finger or mouse ink, kept in letter-box units so it survives resizing */
+function padSetup(){
+  const pad=$("#pad"),cv=$("#ink");if(!pad||!cv)return;
+  const svg=pad.querySelector("svg"),paths=[...svg.querySelectorAll("path.road")];
+  $("#dots").innerHTML=paths.map((p,i)=>{const a=p.getPointAtLength(0);
+    return `<circle cx="${a.x}" cy="${a.y}" r="4.2" class="sdot"/><text x="${a.x}" y="${a.y+1.6}" class="snum">${i+1}</text>`}).join("");
+  const fit=()=>{const r=pad.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);draw()};
+  const draw=()=>{const g=cv.getContext("2d"),k=cv.width/100;g.clearRect(0,0,cv.width,cv.height);
+    g.lineCap="round";g.lineJoin="round";g.lineWidth=4.5*k;g.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--sky").trim()||"#3F8CFF";
+    WR.ink.forEach(st=>{g.beginPath();st.forEach((q,i)=>i?g.lineTo(q[0]*k,q[1]*k):g.moveTo(q[0]*k,q[1]*k));if(st.length===1)g.lineTo(st[0][0]*k+.1,st[0][1]*k);g.stroke()})};
+  const pt=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*115]};
+  let cur=null;
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}cur=[pt(e)];WR.ink.push(cur);draw()};
+  cv.onpointermove=e=>{if(!cur)return;cur.push(pt(e));draw()};
+  cv.onpointerup=cv.onpointercancel=()=>{cur=null};
+  fit();window.onresize=()=>{if(view==="writing"&&$("#ink"))fit()};
+  WR.redraw=draw;
+}
+/* how much of the letter was traced, and how much of the ink stayed on the letter */
+function scoreInk(){
+  const paths=[...document.querySelectorAll("#pad path.road")],model=[];
+  paths.forEach(p=>{const n=p.getTotalLength();for(let d=0;d<=n;d+=2){const a=p.getPointAtLength(d);model.push([a.x,a.y])}});
+  const ink=WR.ink.flat();if(!ink.length||!model.length)return {cover:0,neat:0};
+  const near=(a,list,r)=>list.some(b=>(a[0]-b[0])**2+(a[1]-b[1])**2<=r*r);
+  return {cover:model.filter(m=>near(m,ink,7.5)).length/model.length, neat:ink.filter(q=>near(q,model,9)).length/ink.length};
+}
+function animateStrokes(){
+  const demos=[...document.querySelectorAll("#pad path.demo")],reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  demos.forEach(p=>{const n=p.getTotalLength();p.style.strokeDasharray=n;p.style.strokeDashoffset=n;p.style.opacity=1});
+  let i=0;const next=()=>{if(i>=demos.length)return;const p=demos[i++],n=p.getTotalLength();
+    if(reduce){p.style.strokeDashoffset=0;next();return}
+    const t0=performance.now(),dur=Math.max(500,n*14);
+    const step=t=>{const k=Math.min(1,(t-t0)/dur);p.style.strokeDashoffset=n*(1-k);if(k<1)requestAnimationFrame(step);else setTimeout(next,250)};requestAnimationFrame(step)};
+  next();
 }
 
 /* ---------- game engine ---------- */
@@ -734,6 +961,7 @@ const bind={
     $("#prevW").onclick=()=>{learnIdx=(learnIdx-1+w.length)%w.length;render();speak(w[learnIdx])};
     $("#nextW").onclick=()=>{learnIdx=(learnIdx+1)%w.length;render();speak(w[learnIdx])};
     $("#sayW").onclick=()=>speak(word);
+    const lw=$("#lettersW");if(lw)lw.onclick=()=>{WR.mode="words";WR.word=word;go("writing");sayLetters(word)};
     $("#slowW").onclick=()=>speak(word,{rate:.5});
     $("#spellW").onclick=()=>speak([word,spellOut(word),word],{rate:.75});
     $("#chunkW").onclick=()=>speak([...chunks(word).map(c=>c+"!"),word],{rate:.7});
@@ -757,7 +985,7 @@ const bind={
   rewards(){common();$("#cheer").onclick=()=>speak([...PRAISE,...PERSIST])},
   beryl(){common();
     $("#saveSet").onclick=()=>{S.settings.treat=$("#treat").value||S.settings.treat;S.settings.target=Math.max(5,+$("#target").value||50);
-      S.settings.rate=+$("#rate").value;S.settings.revDay=+$("#revDay").value;S.settings.echo=$("#echo").checked;save();render();toast("Settings saved")};
+      S.settings.rate=+$("#rate").value;S.settings.revDay=+$("#revDay").value;S.settings.echo=$("#echo").checked;S.settings.breakMin=+$("#breakMin").value;save();render();toast("Settings saved")};
     document.querySelectorAll("[data-sample]").forEach(b=>b.onclick=()=>{const r=+$("#rate").value;
       if(b.dataset.sample===""){speak(SAMPLE,{rate:r});return}
       const v=ukVoices()[+b.dataset.sample];if(!v)return;
@@ -768,6 +996,34 @@ const bind={
     document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const v=ukVoices()[+b.dataset.use];if(!v)return;
       S.settings.voice=v.name;save();render();toast(niceName(v.name)+" is now Zulu's voice");speak(`Hello, ${NAME}. This is my new voice.`)});
     $("#resetStars").onclick=()=>confirmBox("Reset Stoute's stars to zero?",()=>{S.stars=0;save();render();toast("Stars reset")});
+  },
+  writing(){common();
+    document.querySelectorAll("[data-wmode]").forEach(b=>b.onclick=()=>{WR.mode=b.dataset.wmode;WR.ink=[];stopSpeech();render()});
+    if(WR.mode==="write"){
+      const L=()=>WR.upper?WR.letter.toUpperCase():WR.letter;
+      document.querySelectorAll("[data-case]").forEach(b=>b.onclick=()=>{WR.upper=b.dataset.case==="upper";WR.ink=[];render();speak(letterLines(WR.letter)[0])});
+      document.querySelectorAll("[data-wletter]").forEach(b=>b.onclick=()=>{WR.letter=b.dataset.wletter;WR.ink=[];render();speak(letterLines(WR.letter))});
+      padSetup();
+      $("#showMe").onclick=()=>{animateStrokes();speak([WR.upper?`Capital ${letterName(L())}.`:`${letterName(L())}.`,WR.upper?`Start at the green dot, and follow the numbers.`:TIP[WR.letter]])};
+      $("#hearL").onclick=()=>speak(letterLines(WR.letter));
+      $("#clearInk").onclick=()=>{WR.ink=[];WR.redraw&&WR.redraw();$("#wfb").innerHTML=""};
+      $("#doneInk").onclick=()=>{const r=scoreInk();
+        if(r.cover>=.7&&r.neat>=.6){ding();burst();addStars(1);const pr=rand(PRAISE);
+          $("#wfb").innerHTML=`<div class="feedback good">⭐ Beautiful ${esc(L())}! ${pr}<br>Now write it three times on paper with a pencil. ✏️</div>`;say(pr,{voice:false,mood:"happy"});speak([`Beautiful ${letterName(L())}!`,pr])}
+        else{boop();const pe=rand(PERSIST),why=r.cover<.7?"Try to trace the whole grey letter.":"Try to keep your line on the grey letter.";
+          $("#wfb").innerHTML=`<div class="feedback bad">${why} ${pe}</div>`;say(pe,{voice:false,mood:"think"});speak([why,pe])}};
+      const mv=d=>{const i=(ABC.indexOf(WR.letter)+d+26)%26;WR.letter=ABC[i];WR.ink=[];render();speak(letterLines(WR.letter))};
+      $("#prevL").onclick=()=>mv(-1);$("#nextL").onclick=()=>mv(1);
+    }else if(WR.mode==="abc"){
+      document.querySelectorAll("[data-say-letter]").forEach(b=>b.onclick=()=>speak(letterLines(b.dataset.sayLetter)));
+      $("#singABC").onclick=()=>speak(ABC.map(c=>letterName(c)+"."),{rate:.8});
+    }else{
+      document.querySelectorAll("[data-wword]").forEach(b=>b.onclick=()=>{WR.word=b.dataset.wword;render();sayLetters(WR.word)});
+      document.querySelectorAll("[data-wl]").forEach(b=>b.onclick=()=>{const w=WR.word.toLowerCase().replace(/[^a-z]/g,"");WR.active=+b.dataset.wl;paintActive();speak(letterLines(w[WR.active]))});
+      $("#soundOut").onclick=()=>sayLetters(WR.word);
+      $("#sayWord").onclick=()=>speak(WR.word);
+      $("#writeFirst").onclick=()=>{const c=WR.word.toLowerCase().replace(/[^a-z]/g,"")[0];if(!c)return;WR.mode="write";WR.letter=c;WR.upper=false;WR.ink=[];render();speak(letterLines(c))};
+    }
   },
   help(){common();$("#readHelp").onclick=()=>speak([...document.querySelectorAll("#view .trick")].map(t=>t.innerText.replace(/\n/g,". ")))}
 };
@@ -780,10 +1036,10 @@ function bindGame(){
   const n=$("#nextG");if(n){n.onclick=nextRound;n.focus();return}
   const f=$("#spellForm");
   if(f){const inp=$("#ans");
-    inp.addEventListener("input",e=>{if(!S.settings.echo)return;const c=inp.value.slice(-1);if(/[a-z]/i.test(c)&&e.inputType!=="deleteContentBackward")speak(c.toUpperCase(),{rate:1})});
+    inp.addEventListener("input",e=>{if(!S.settings.echo)return;const c=inp.value.slice(-1);if(/[a-z]/i.test(c)&&e.inputType!=="deleteContentBackward")speak(letterName(c),{rate:1})});
     f.onsubmit=e=>{e.preventDefault();check(inp.value)};
     $("#hintBtn").onclick=()=>{const known=inp.value.toLowerCase();let i=0;while(i<known.length&&known[i]===w[i])i++;
-      inp.value=w.slice(0,i+1);inp.focus();speak(`The next letter is ${w[i].toUpperCase()}`)};
+      inp.value=w.slice(0,i+1);inp.focus();speak(`The next letter is ${letterName(w[i])}.`)};
     setTimeout(()=>inp.focus(),50);
   }
   document.querySelectorAll("[data-tile]").forEach(b=>b.onclick=()=>{const i=+b.dataset.tile;game.used.push(i);game.built+=game.letters[i];speak(game.letters[i].toUpperCase(),{rate:1});render()});
@@ -840,11 +1096,17 @@ function openRadio(mode){
   else signatureCall("end");
 }
 $("#radioBtn").onclick=()=>{const n=$("#radioBtn").dataset.next||"start";
-  if(n==="close"){$("#radio").hidden=true;say(`Welcome, ${NAME}! I am Zulu 1, your personal tutor. Tap My Words or Learn to begin.`,{mood:"happy"})}
+  if(n==="close"){$("#radio").hidden=true;sessionStart=Date.now();breakSaid=false;say(`Welcome, ${NAME}! I am Zulu 1, your personal tutor. Tap My Words or Learn to begin.`,{mood:"happy"})}
   else{$("#replayCall").dataset.mode="start";signatureCall("start")}};
 $("#replayCall").onclick=()=>signatureCall($("#replayCall").dataset.mode||"start");
 $("#endSession").onclick=()=>{game=null;view="home";render();openRadio("end")};
 $("#radioBtn").dataset.next="start";
+/* After a while on screen, Zulu suggests switching to pencil and paper. */
+let sessionStart=Date.now(),breakSaid=false;
+setInterval(()=>{const m=S.settings.breakMin??15;if(!m||breakSaid||document.hidden||!$("#radio").hidden)return;
+  if(Date.now()-sessionStart>=m*60000){breakSaid=true;
+    say(`Super work, ${NAME}! Time for a pencil break. Write three of your words on paper, then show a grown-up.`,{mood:"happy"});
+    toast("✏️ Pencil break! Write three words on paper.")}},30000);
 
 render();
 })();

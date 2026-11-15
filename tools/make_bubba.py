@@ -253,5 +253,12 @@ rep('/* Radio signature call */', '''.packs{display:flex;flex-wrap:wrap;gap:8px}
 @media (max-width:420px){.opts{grid-template-columns:1fr}}
 /* Radio signature call */''')
 
+# ---- Bubba is 12: no toddler Writing tile or letter-by-letter button; keep the 8-tile menu ----
+rep('''    <button class="tile" style="--c:var(--mint)" data-view="writing"><span class="ic">✍️</span>Writing</button>\n''', '')
+rep('''\n      <button class="btn" style="--c:var(--mint)" id="lettersW">🐣 Letter by letter</button>''', '')
+rep('''.nav{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px}''', '''.nav{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}''')
+rep('''@media (max-width:760px){.nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nav .tile{font-size:1rem}}''', '''@media (max-width:760px){.nav{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.nav .tile{font-size:1rem}}''')
+rep('''      <div class="trick" style="--c:var(--mint)"><h3>✍️ Writing</h3>''', '''      <div class="trick" style="--c:var(--mint)" hidden><h3>✍️ Writing</h3>''')
+
 open(dst, "w", encoding="utf-8").write(s)
 print("ok", len(s))
