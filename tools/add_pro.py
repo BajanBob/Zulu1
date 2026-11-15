@@ -106,7 +106,10 @@ async function askPro(req){
     r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal:ctl.signal,headers:{"content-type":"application/json","x-api-key":p.key,
       "anthropic-version":PRO_API_VERSION,"anthropic-dangerous-direct-browser-access":"true"},
       body:JSON.stringify({model:PRO_MODEL,max_tokens:1500,system:q.system,messages:[{role:"user",content:q.user}]})});
-    if(!r.ok)throw new Error(r.status===401?"The Claude API key was not accepted.":`Claude answered with error ${r.status}.`);
+    if(!r.ok){let why="";try{const e=await r.json();why=(e&&e.error&&e.error.message)||""}catch(_){}
+      if(r.status===401)throw new Error("The Claude API key was not accepted. Check it was copied in full.");
+      if(/credit balance/i.test(why))throw new Error("Your Claude account has no credit yet. Add credit under Billing at platform.claude.com, then test again.");
+      throw new Error(`Claude answered with error ${r.status}${why?": "+why:"."}`)}
     const d=await r.json();return parseJSON((d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join(""));
   }catch(e){if(e.name==="AbortError")throw new Error("Zulu Pro took too long to answer. Check the internet connection.");
     if(e instanceof TypeError)throw new Error("Zulu Pro could not connect. Check the internet connection. This preview page cannot connect, but the apps and website can.");throw e}
