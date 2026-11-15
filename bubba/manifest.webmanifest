@@ -1,0 +1,29 @@
+{
+ "id": "zulu1-bubba",
+ "name": "Bubba's Zulu 1 Tutor",
+ "short_name": "Zulu 1 Bubba",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#FFF8E6",
+ "theme_color": "#FFC328",
+ "description": "A talking spelling tutor with games, stars and handwriting.",
+ "icons": [
+  {
+   "src": "../icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "../icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "../icons/icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
