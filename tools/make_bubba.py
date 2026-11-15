@@ -220,7 +220,7 @@ rep('''    $("#readAll").onclick=()=>speak([`Your words this week are:`,...words
     const ap=$("#addPicked");if(ap)ap.onclick=()=>{const wk=week(),n=[...picked].filter(x=>!wk.words.includes(x));n.forEach(x=>wk.words.push(x));
       picked=new Set();save();render();say(`Brilliant, ${NAME}! I added ${n.length} ${PACKS[openPack].name} word${n.length===1?"":"s"} with their meanings.`,{mood:"happy"})};
     const pr=$("#pickRandom");if(pr)pr.onclick=()=>{const have=week().words;picked=new Set(shuffle(Object.keys(PACKS[openPack].words).filter(x=>!have.includes(x))).slice(0,8));render()};''')
-rep('''S.weeks[WK]={words:[],progress:{}};''', '''S.weeks[WK]={words:[],progress:{},meanings:{}};''')
+# (deleting words now goes through delWords, which also removes meanings)
 
 # ---- learn binding ----
 rep('''    $("#sayW").onclick=()=>speak(word);''',
@@ -232,8 +232,8 @@ rep('''...words().map(w=>`${w}. ${spellOut(w)}. ${w}.`)],{rate:.8});''',
     '''...words().map(w=>`${w}. ${spellOut(w)}. ${w}.${meaningOf(w)?" It means: "+meaningOf(w)+".":""}`)],{rate:.8});''')
 
 # ---- help text ----
-rep('''<p>Each week, type the new spelling words and tap <b>Add words</b>.</p>''',
-    '''<p>Each week, type your spelling words from school, or pick words from the Year 7 &amp; 8 subject packs. Add meanings with a dash.</p>''')
+rep('''<p>Each week, type the new spelling words and tap <b>Add words</b>. Tap 🗑️ on a word to delete it, or <b>Delete words</b> to remove several. Made a mistake? Tap <b>Undo</b>.</p>''',
+    '''<p>Each week, type your spelling words from school, or pick words from the Year 7 &amp; 8 subject packs. Add meanings with a dash. Tap 🗑️ on a word to delete it, or <b>Delete words</b> to remove several, with <b>Undo</b> if needed.</p>''')
 rep('''<p>Hear each word, clap the chunks, and read the memory tricks and silly stories.</p>''',
     '''<p>Hear each word and its meaning, see how the word is built from prefixes, roots and suffixes, and read the memory tricks.</p>''')
 rep('''<p>Play Spelling Bee, Unscramble and Missing Letters. Zulu says each letter you type and reads back your answer.</p>''',

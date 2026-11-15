@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Bubba's Zulu 1 Tutor</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Zulu 1 Bubba">
+<meta name="theme-color" content="#FFC328">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
@@ -177,6 +183,13 @@ label{font-weight:700}
 details{display:flex;flex-direction:column;gap:6px}
 details summary{cursor:pointer;padding:4px 0}
 details p{margin-top:6px}
+.chip button.del{background:var(--bad)}
+.undo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border:3px solid var(--sea);border-radius:16px;padding:10px 14px;font-weight:700;background:color-mix(in srgb,var(--sea) 12%,var(--surface))}
+.delbox{display:flex;flex-direction:column;gap:10px;border:3px dashed var(--bad);border-radius:18px;padding:14px}
+.delbox h3{color:var(--bad)}
+.dchip{border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:700;font-size:1rem}
+.dchip.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.wkwords{min-width:0;display:flex;flex-direction:column;gap:8px}
 .packs{display:flex;flex-wrap:wrap;gap:8px}
 .pk{--c:var(--sea);border:3px solid var(--c);background:var(--surface);color:var(--ink);border-radius:14px;padding:8px 14px;font-family:var(--display);font-weight:800;font-size:1.05rem;display:inline-flex;gap:6px;align-items:center}
 .pk.on{background:var(--c);color:#fff}
@@ -568,7 +581,16 @@ function hidden(word){const w=word.toLowerCase();return [...new Set(SMALL.filter
 
 /* ---------- views ---------- */
 let view="home", learnIdx=0, game=null;
-function go(v){view=v;game=game&&v==="games"?game:null;render();window.scrollTo({top:document.querySelector(".nav").offsetTop-8,behavior:"smooth"})}
+/* ---------- deleting words (with Undo) ---------- */
+let lastDel=null, delMode=false, delPick=new Set();
+function delWords(k,list){const wk=week(k);lastDel={k,snap:JSON.stringify(wk),label:list.length===1?`"${list[0]}"`:`${list.length} words`};
+  wk.words=wk.words.filter(x=>!list.includes(x));
+  list.forEach(x=>{if(wk.progress)delete wk.progress[x];if(wk.meanings)delete wk.meanings[x]});
+  if(!wk.words.length&&k!==WK)delete S.weeks[k];
+  learnIdx=0;save();render();toast(`Deleted ${lastDel.label}`)}
+function undoDel(){if(!lastDel)return;S.weeks[lastDel.k]=JSON.parse(lastDel.snap);toast(`Brought back ${lastDel.label}`);lastDel=null;save();render()}
+const undoBar=()=>lastDel?`<div class="undo" role="status"><span>🗑️ Deleted <b>${esc(lastDel.label)}</b>.</span><button class="btn" style="--c:var(--sea)" id="undoDel">↩ Undo</button></div>`:"";
+function go(v){if(v!==view){lastDel=null;delMode=false;delPick=new Set()}view=v;game=game&&v==="games"?game:null;render();window.scrollTo({top:document.querySelector(".nav").offsetTop-8,behavior:"smooth"})}
 document.querySelectorAll(".tile").forEach(b=>b.addEventListener("click",()=>{go(b.dataset.view);onEnter(b.dataset.view)}));
 function onEnter(v){
   const lines={home:`Welcome back, ${NAME}! I am Zulu 1, your personal tutor.`,words:`${NAME}, type the words you need to learn this week.`,
@@ -617,9 +639,15 @@ function wordsView(){
         <button class="btn ghost" id="pickRandom">🎲 Pick 8 for me</button></div>`:""}
     </div>
     ${w.length?`<div class="chips">${w.map((x,i)=>`<span class="chip" style="--c:${COLORS[i%COLORS.length]}" title="${esc(meaningOf(x))}">${esc(x)} <span class="ok">${prog(x).right>=3?"⭐":""}</span>
-      <button data-say="${esc(x)}" aria-label="Hear ${esc(x)}">🔊</button><button data-del="${i}" aria-label="Remove ${esc(x)}">✕</button></span>`).join("")}</div>
-      <div class="row"><button class="btn ghost" id="clearWords">Clear this week's list</button></div><div id="confirmBox"></div>`
-    :`<div class="example">No words yet, so Zulu is using example words: ${EXAMPLES.join(", ")}. Add your own to replace them.</div>`}`);
+      <button data-say="${esc(x)}" aria-label="Hear ${esc(x)}">🔊</button><button class="del" data-del="${esc(x)}" aria-label="Delete ${esc(x)}" title="Delete ${esc(x)}">🗑️</button></span>`).join("")}</div>
+      ${undoBar()}
+      ${delMode?`<div class="delbox"><h3>🗑️ Tap the words to delete</h3>
+        <div class="chips">${w.map(x=>`<button class="dchip ${delPick.has(x)?"on":""}" data-dpick="${esc(x)}" aria-pressed="${delPick.has(x)}">${delPick.has(x)?"✓ ":""}${esc(x)}</button>`).join("")}</div>
+        <div class="row"><button class="btn" style="--c:var(--bad)" id="delPicked" ${delPick.size?"":"disabled"}>🗑️ Delete ${delPick.size} word${delPick.size===1?"":"s"}</button>
+        <button class="btn ghost" id="delAllPick">Select all</button><button class="btn ghost" id="delCancel">Cancel</button></div></div>`
+      :`<div class="row"><button class="btn" style="--c:var(--bad)" id="selectDel">🗑️ Delete words</button><button class="btn ghost" id="clearWords">Delete all this week's words</button></div>`}
+      <div id="confirmBox"></div>`
+    :`${undoBar()}<div class="example">No words yet, so Zulu is using example words: ${EXAMPLES.join(", ")}. Add your own to replace them.</div>`}`);
 }
 function learn(){
   const w=words();learnIdx=Math.min(learnIdx,w.length-1);const word=w[learnIdx];const ch=chunks(word),hid=hidden(word);
@@ -665,8 +693,9 @@ function revision(){
       <div class="row"><button class="btn" style="--c:var(--grape)" id="recapAll">🔊 Recap all words</button>
       <button class="btn big" style="--c:var(--coral)" data-rev="${WK}">📝 Start revision test</button></div>
       ${last?`<p class="counter">Last revision score: ${last.score} of ${last.total}</p>`:""}</div>
-    ${past.length?`<h3>Past weeks</h3>${past.map(k=>`<div class="wkcard"><div><h3>${weekLabel(k)}</h3><p class="hint">${S.weeks[k].words.map(esc).join(", ")}</p></div>
-      <button class="btn" style="--c:var(--grape)" data-rev="${k}">Revise</button></div>`).join("")}
+    ${undoBar()}<div id="confirmBox"></div>
+    ${past.length?`<h3>Past weeks</h3>${past.map(k=>`<div class="wkcard"><div class="wkwords"><h3>${weekLabel(k)}</h3><div class="chips">${S.weeks[k].words.map((x,i)=>`<span class="chip" style="--c:${COLORS[i%COLORS.length]}">${esc(x)}<button class="del" data-pdel="${k}|${esc(x)}" aria-label="Delete ${esc(x)}" title="Delete ${esc(x)}">🗑️</button></span>`).join("")}</div></div>
+      <div class="row"><button class="btn" style="--c:var(--grape)" data-rev="${k}">Revise</button><button class="btn ghost" data-wdel="${k}">🗑️ Delete week</button></div></div>`).join("")}
       <button class="btn" style="--c:var(--sky)" data-rev="ALL">🌈 Big mixed recap of all weeks</button>`:""}`);
 }
 function rewards(){
@@ -723,7 +752,7 @@ function beryl(){
 function help(){
   return panel("var(--sky)","How to Use Zulu",`
     <div class="tricks">
-      <div class="trick" style="--c:var(--coral)"><h3>1. ✏️ My Words</h3><p>Each week, type your spelling words from school, or pick words from the Year 7 &amp; 8 subject packs. Add meanings with a dash.</p></div>
+      <div class="trick" style="--c:var(--coral)"><h3>1. ✏️ My Words</h3><p>Each week, type your spelling words from school, or pick words from the Year 7 &amp; 8 subject packs. Add meanings with a dash. Tap 🗑️ on a word to delete it, or <b>Delete words</b> to remove several, with <b>Undo</b> if needed.</p></div>
       <div class="trick" style="--c:var(--tang)"><h3>2. 💡 Learn</h3><p>Hear each word and its meaning, see how the word is built from prefixes, roots and suffixes, and read the memory tricks.</p></div>
       <div class="trick" style="--c:var(--leaf)"><h3>3. 🎮 Games</h3><p>Play Spelling Bee, Unscramble, Missing Letters and Meaning Match. Zulu says each letter you type and reads back your answer.</p></div>
       <div class="trick" style="--c:var(--grape)"><h3>4. 📚 Revision</h3><p>At the end of the week, recap every word and take the revision test for a certificate.</p></div>
@@ -834,8 +863,14 @@ const bind={
     const ap=$("#addPicked");if(ap)ap.onclick=()=>{const wk=week(),n=[...picked].filter(x=>!wk.words.includes(x));n.forEach(x=>wk.words.push(x));
       picked=new Set();save();render();say(`Brilliant, ${NAME}! I added ${n.length} ${PACKS[openPack].name} word${n.length===1?"":"s"} with their meanings.`,{mood:"happy"})};
     const pr=$("#pickRandom");if(pr)pr.onclick=()=>{const have=week().words;picked=new Set(shuffle(Object.keys(PACKS[openPack].words).filter(x=>!have.includes(x))).slice(0,8));render()};
-    document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{week().words.splice(+b.dataset.del,1);save();render()});
-    const c=$("#clearWords");if(c)c.onclick=()=>confirmBox("Clear all words for this week?",()=>{S.weeks[WK]={words:[],progress:{},meanings:{}};save();render()});
+    document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>delWords(WK,[b.dataset.del]));
+    const c=$("#clearWords");if(c)c.onclick=()=>confirmBox("Delete all of this week's words?",()=>delWords(WK,[...week().words]));
+    const sd=$("#selectDel");if(sd)sd.onclick=()=>{delMode=true;delPick=new Set();render()};
+    document.querySelectorAll("[data-dpick]").forEach(b=>b.onclick=()=>{const x=b.dataset.dpick;delPick.has(x)?delPick.delete(x):delPick.add(x);render()});
+    const dp=$("#delPicked");if(dp)dp.onclick=()=>{const l=[...delPick];delMode=false;delPick=new Set();delWords(WK,l)};
+    const da=$("#delAllPick");if(da)da.onclick=()=>{delPick=new Set(week().words);render()};
+    const dc=$("#delCancel");if(dc)dc.onclick=()=>{delMode=false;delPick=new Set();render()};
+    const ud=$("#undoDel");if(ud)ud.onclick=undoDel;
   },
   learn(){common();const w=words(),word=w[learnIdx];
     $("#prevW").onclick=()=>{learnIdx=(learnIdx-1+w.length)%w.length;render();speak(w[learnIdx])};
@@ -856,6 +891,9 @@ const bind={
     if(game)bindGame();
   },
   revision(){common();
+    document.querySelectorAll("[data-pdel]").forEach(b=>b.onclick=()=>{const [k,x]=b.dataset.pdel.split("|");delWords(k,[x])});
+    document.querySelectorAll("[data-wdel]").forEach(b=>b.onclick=()=>{const k=b.dataset.wdel;confirmBox(`Delete all words from the ${weekLabel(k).replace(/^Week of /,"week of ")}?`,()=>delWords(k,[...S.weeks[k].words]))});
+    const ud=$("#undoDel");if(ud)ud.onclick=undoDel;
     const r=$("#recapAll");if(r)r.onclick=()=>speak([`Let's recap, ${NAME}.`,...words().map(w=>`${w}. ${spellOut(w)}. ${w}.${meaningOf(w)?" It means: "+meaningOf(w)+".":""}`)],{rate:.8});
     document.querySelectorAll("[data-rev]").forEach(b=>b.onclick=()=>{const k=b.dataset.rev;
       let list=k==="ALL"?[...new Set(Object.values(S.weeks).flatMap(x=>x.words))]:(k===WK?words():S.weeks[k].words);
