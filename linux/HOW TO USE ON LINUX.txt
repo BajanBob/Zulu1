@@ -1,0 +1,16 @@
+ZULU 1 PRO ON LINUX
+Two tutors: "Zulu 1 Tutor" (Master Shakai) and "Zulu 1 Bubba" (Master Bubba).
+
+INSTALL (once)
+1. Unzip this file and move the "Zulu 1 Pro - Linux" folder somewhere to keep, for example your home folder.
+2. Open a terminal in that folder and run:   sh install.sh
+3. "Zulu 1 Tutor" and "Zulu 1 Bubba" appear in your applications menu (under Education).
+
+WITHOUT INSTALLING
+Open shakai/index.html or bubba/index.html in Chrome, Chromium, Edge or Firefox.
+
+GOOD TO KNOW
+- Chrome or Chromium is best: it opens the tutor in its own window and has natural UK voices.
+- On some Linux systems Firefox has no voices; if Zulu is silent, install Chrome or Chromium.
+- Stars and words are kept as long as you keep the folder in the same place.
+- Zulu 1 Pro: open Beryl > Zulu 1 Pro and paste your Claude API key.

@@ -9,10 +9,56 @@ permissions:
   contents: write
 
 jobs:
+  windows-exe:
+    # Builds a Windows program (.exe) for each student, with the tutor page inside it.
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the .exe files
+        shell: pwsh
+        run: |
+          $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+          New-Item -ItemType Directory -Force dist | Out-Null
+          $editions = @(
+            @{ name = "Shakai"; page = "index.html";       exe = "Zulu1-Tutor-Shakai.exe" },
+            @{ name = "Bubba";  page = "bubba\index.html"; exe = "Zulu1-Tutor-Bubba.exe" }
+          )
+          foreach ($e in $editions) {
+            (Get-Content windows\Launcher.cs -Raw).Replace("EDITION_NAME", $e.name) | Set-Content -Encoding UTF8 build.cs
+            Copy-Item $e.page tutor.html -Force
+            & $csc /nologo /target:winexe /optimize+ /reference:System.Windows.Forms.dll `
+              "/win32icon:windows\zulu1.ico" "/resource:tutor.html,tutor.html" "/out:dist\$($e.exe)" build.cs
+            if ($LASTEXITCODE -ne 0) { throw "Build failed for $($e.name)" }
+          }
+          @"
+          ZULU 1 PRO FOR WINDOWS (.exe)
+          Zulu1-Tutor-Shakai.exe = Master Shakai's tutor
+          Zulu1-Tutor-Bubba.exe  = Master Bubba's tutor
+
+          1. Copy the .exe to the Desktop (or anywhere you like) and double-click it.
+          2. Windows may say "Windows protected your PC" because the program is new and not signed.
+             Click "More info", then "Run anyway". This is only asked the first time.
+          3. The tutor opens in its own window (Microsoft Edge). Stars and words are kept between runs.
+          4. Zulu 1 Pro: open Beryl > Zulu 1 Pro and paste your Claude API key.
+          "@ | Set-Content -Encoding UTF8 "dist\HOW TO USE.txt"
+          Compress-Archive -Path dist\* -DestinationPath Zulu1-Pro-Windows-EXE.zip -Force
+          Get-ChildItem dist, Zulu1-Pro-Windows-EXE.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: |
+            dist/*.exe
+            Zulu1-Pro-Windows-EXE.zip
+
   site:
+    needs: windows-exe
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-exe
+          path: exe
       - name: Put the tutors on the gh-pages branch
         run: |
           mkdir -p site/bubba
@@ -22,6 +68,8 @@ jobs:
           cp bubba/manifest.webmanifest site/bubba/
           cp -r icons site/
           cp -r downloads site/
+          cp exe/Zulu1-Pro-Windows-EXE.zip exe/dist/*.exe site/downloads/ 2>/dev/null || cp exe/Zulu1-Pro-Windows-EXE.zip $(find exe -name '*.exe') site/downloads/
+          ls -la site/downloads
           touch site/.nojekyll
           cd site
           git init -q -b gh-pages
