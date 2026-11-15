@@ -278,7 +278,7 @@ details p{margin-top:6px}
 
 <div class="wrap">
   <div class="top">
-    <div class="brand"><small>Personal tutor of Master Shakai Stoute</small><h1>Zulu 1 Ham Dog Tutor <span class="probadge" id="proBadge" hidden>PRO</span></h1></div>
+    <div class="brand"><small id="tutorOf">Personal tutor of Master Shakai Stoute</small><h1><span id="appName">Zulu 1 Ham Dog Tutor</span> <span class="probadge" id="proBadge" hidden>PRO</span></h1></div>
     <div class="starpill" title="Stars earned"><svg viewBox="0 0 24 24"><path fill="#fff" stroke="#3B2A00" stroke-width="1.5" d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="starCount">0</span></div>
     <button class="btn" style="--c:var(--coral)" id="endSession">📻 End session</button>
   </div>
@@ -341,9 +341,10 @@ details p{margin-top:6px}
 
 <script>
 (function(){
-const NAME = "Master Shakai Stoute";
-const PRAISE = ["Stoute, you are very smart!","You are just brilliant!","You are very bright and shining like the sun!","Wow, you are so very intelligent!"];
-const PERSIST = ["You cannot give up!","Failure is not final.","Stoute, you must never give up!","Success comes to those who never give up."];
+const DEFAULT_NAME = "Master Shakai Stoute", DEFAULT_SHORT = "Stoute", DEFAULT_TUTOR = "Zulu 1";
+let NAME = DEFAULT_NAME, SHORT = DEFAULT_SHORT, TUTOR = DEFAULT_TUTOR;
+const PRAISE_T = ["{short}, you are very smart!","You are just brilliant!","You are very bright and shining like the sun!","Wow, you are so very intelligent!"];
+const PERSIST_T = ["You cannot give up!","Failure is not final.","{short}, you must never give up!","Success comes to those who never give up."];
 const BADGES = [
   {at:5,ic:"🐾",name:"Puppy Paws",c:"var(--sea)"},
   {at:15,ic:"🦴",name:"Golden Bone",c:"var(--sun)"},
@@ -363,6 +364,18 @@ const KEY="zulu1-tutor-v1";
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.weeks)return s}catch(e){}return null}
 let S = load() || {stars:0, weeks:{}, settings:{treat:"A trip to the beach with Granny Beryl", target:50, echo:true, rate:0.85, voice:"", revDay:5}, revisions:[], treatsClaimed:0};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+/* Names chosen in Beryl's corner */
+const PRAISE=[], PERSIST=[];
+function applyNames(){const st=S.settings;
+  NAME=(st.studentName||DEFAULT_NAME).trim();SHORT=(st.shortName||DEFAULT_SHORT).trim();TUTOR=(st.tutorName||DEFAULT_TUTOR).trim();
+  PRAISE.splice(0,PRAISE.length,...PRAISE_T.map(x=>x.replace("{short}",SHORT)));
+  PERSIST.splice(0,PERSIST.length,...PERSIST_T.map(x=>x.replace("{short}",SHORT)))}
+applyNames();
+/* Show the chosen tutor name wherever the app says "Zulu". The product name "Zulu 1 Pro" stays. */
+function brand(t){t=String(t);if(TUTOR===DEFAULT_TUTOR)return t;
+  return t.replace(/Zulu 1 Pro/g,"\u0001").replace(/Zulu Pro/g,"\u0002")
+    .replace(/Zulu 1 Ham Dog/g,TUTOR).replace(/Zulu (1|one|One)\b/g,TUTOR).replace(/\bZulu\b/g,TUTOR)
+    .replace(/\u0001/g,"Zulu 1 Pro").replace(/\u0002/g,"Zulu Pro")}
 
 function weekKey(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);
   return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")}
@@ -406,9 +419,13 @@ function androidLabel(v,i){const m=v.name.match(/gb([a-z])/i);const n={a:"Voice 
   return (n||("UK voice "+(i+1)))+(v.online?" (online)":"")}
 try{if(window.AndroidTTS&&typeof AndroidTTS.useVoice==="function")AndroidTTS.useVoice(S.settings.androidVoice||"")}catch(e){}
 const niceName=n=>n.replace(/^Microsoft\s+/i,"").replace(/\s*-\s*English.*$/i,"").replace(/\s*\(English.*\)$/i,"").replace(/Online \(Natural\)/i,"").trim();
-const SAMPLE=`Hello, Master Shakai Stoute. I am Zulu one, your personal tutor. Let's spell the word "because". You are very bright, and shining like the sun!`;
+const sampleText=()=>`Hello, ${NAME}. I am Zulu one, your personal tutor. Let's spell the word "because". You are very bright, and shining like the sun!`;
 /* Shakai is pronounced "Shaaa-Ki" and Stoute like "stout", so the voice is given those spellings */
-const sayable=t=>String(t).replace(/\bShakai\b/g,"Shah-kye").replace(/\bStoute\b/g,"Stowt");
+const DEFAULT_SAYAS="Shakai=Shah-kye; Stoute=Stowt";
+/* Beryl writes "name=how it sounds; name=how it sounds" so the voice says names properly */
+function sayAs(t){(S.settings.sayAs??DEFAULT_SAYAS).split(/[;\n]/).map(x=>x.split("=")).filter(x=>x.length===2&&x[0].trim()&&x[1].trim())
+  .forEach(([a,b])=>{t=t.replace(new RegExp("\\b"+a.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","g"),b.trim())});return t}
+const sayable=t=>sayAs(brand(String(t)));
 /* Android app: speech goes through the phone's own UK text-to-speech */
 let ttsN=0;const ttsCb={};
 window.__ttsDone=id=>{const f=ttsCb[id];if(f){delete ttsCb[id];f()}};
@@ -463,9 +480,9 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const rand=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-function say(text,{voice=true,mood}={}){$("#bubble").textContent=text;if(voice)speak(text);
+function say(text,{voice=true,mood}={}){$("#bubble").textContent=brand(text);if(voice)speak(text);
   const d=$("#dog");d.classList.remove("happy","think");void d.offsetWidth;if(mood)d.classList.add(mood)}
-function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+function toast(t){const el=$("#toast");el.textContent=brand(t);el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
 function burst(n=14){const b=$("#burst");for(let i=0;i<n;i++){const s=document.createElement("span");s.textContent=rand(["⭐","🌟","✨","🦴"]);
   s.style.left=Math.random()*100+"vw";s.style.animationDelay=(Math.random()*.4)+"s";b.appendChild(s);setTimeout(()=>s.remove(),2200)}}
 function addStars(n){const before=S.stars;S.stars+=n;save();$("#starCount").textContent=S.stars;
@@ -561,7 +578,7 @@ function render(){
   $("#view").innerHTML=V();
   bind[view]&&bind[view]();
 }
-const panel=(c,title,body,extra="")=>`<section class="panel" style="--c:${c}"><header><h2>${title}</h2>${extra}</header>${body}</section>`;
+const panel=(c,title,body,extra="")=>brand(`<section class="panel" style="--c:${c}"><header><h2>${title}</h2>${extra}</header>${body}</section>`);
 
 function home(){
   const w=words(),today=new Date(),isRev=today.getDay()===S.settings.revDay||today.getDay()===6||today.getDay()===0;
@@ -700,6 +717,7 @@ function beryl(){
         <p class="hint">This is general information from published research, not medical advice. Every child is different. If you are worried about your child's development, speak to their teacher or doctor.</p>
       </div>
     </details>
+    ${namesCard()}
     ${proCard()}
     <div class="trick" style="--c:var(--sea)"><h3>🎙️ Voice samples</h3>
       <p class="hint">Play each voice and choose the one that sounds most natural. Voices marked ✨ Natural sound the most like a real person.</p>
@@ -715,7 +733,7 @@ function beryl(){
       <div class="set"><label for="rate">Speaking speed</label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="${S.settings.rate}"><small class="hint">Middle is the most natural.</small></div>
       <div class="set"><label for="revDay">Revision day</label><select id="revDay" class="field">${DAYS.map((d,i)=>`<option value="${i}" ${S.settings.revDay==i?"selected":""}>${d}</option>`).join("")}</select></div>
       <div class="set"><label for="breakMin">Suggest a pencil-and-paper break after</label><select id="breakMin" class="field">${[0,10,15,20,30].map(m=>`<option value="${m}" ${(S.settings.breakMin??15)==m?"selected":""}>${m?m+" minutes":"Never"}</option>`).join("")}</select></div>
-      <div class="set"><span class="switch"><input type="checkbox" id="echo" ${S.settings.echo?"checked":""}><label for="echo">Say each letter as Stoute types</label></span></div>
+      <div class="set"><span class="switch"><input type="checkbox" id="echo" ${S.settings.echo?"checked":""}><label for="echo">Say each letter as ${esc(SHORT)} types</label></span></div>
     </div>
     <div class="row"><button class="btn" style="--c:var(--rose)" id="saveSet">Save settings</button>
       <button class="btn ghost" id="resetStars">Reset stars</button></div><div id="confirmBox"></div>`);
@@ -729,7 +747,7 @@ function help(){
       <div class="trick" style="--c:var(--mint)"><h3>✍️ Writing</h3><p>Trace letters on the handwriting lines. Tap <b>Show me</b> to watch how each letter is formed, then trace it and tap <b>I'm done</b>. <b>Letter sounds</b> says each letter's name and sound.</p></div>
       <div class="trick" style="--c:var(--grape)"><h3>4. 📚 Revision</h3><p>At the end of the week, recap every word and take the revision test for a certificate.</p></div>
       <div class="trick" style="--c:var(--sun)"><h3>5. ⭐ Rewards</h3><p>Collect stars, win badges, and earn Granny Beryl's treat.</p></div>
-      <div class="trick" style="--c:var(--sea)"><h3>📻 Signature call</h3><p>Every session starts with Zulu's Morse code call sign, Z U L U 1, and "This is Zulu one calling Master Shakai Stoute". Tap <b>End session</b> to hear the call sign and "Zulu one out".</p></div>
+      <div class="trick" style="--c:var(--sea)"><h3>📻 Signature call</h3><p>Every session starts with Zulu's Morse code call sign, ${SIG.split("").join(" ")}, and "This is Zulu one calling ${esc(NAME)}". Tap <b>End session</b> to hear the call sign and "Zulu one out".</p></div>
       <div class="trick" style="--c:var(--grape)"><h3>🤖 Zulu's plan</h3><p>Home shows Zulu's plan for today: the words that need most practice and the games to play. Tap <b>Start</b> on each step. With Zulu 1 Pro switched on, the plan is made by AI.</p></div>
       <div class="trick" style="--c:var(--rose)"><h3>Sound tip</h3><p>Turn the volume up. Tap any 🔊 button to hear Zulu. Your progress stays saved on this device.</p></div>
     </div><button class="btn big" style="--c:var(--sky)" id="readHelp">🔊 Read this to me</button>`);
@@ -901,8 +919,9 @@ const PRO_MODEL="claude-haiku-5-5", PRO_API_VERSION="2026-10-21";
 function pro(){if(!S.settings.pro)S.settings.pro={mode:"off",url:"",code:"",key:""};return S.settings.pro}
 function proOn(){const p=pro();return (p.mode==="service"&&/^https:\/\//.test(p.url))||(p.mode==="key"&&p.key.length>20)}
 /* Names never leave the device: every outgoing text is scrubbed first. */
+const nameParts=()=>[TUTOR,...NAME.replace(/^(Master|Miss|Mr|Mrs|Ms)\s+/i,"").split(/\s+/),SHORT].filter(x=>x&&x.length>1&&x!==DEFAULT_TUTOR);
 const NAME_PARTS=NAME.replace(/^(Master|Miss|Mr|Mrs|Ms)\s+/i,"").split(/\s+/).filter(x=>x.length>1).concat(["Shakai","Stoute","Bubba","Elian"]);
-function scrub(t){let x=String(t);NAME_PARTS.forEach(n=>{x=x.replace(new RegExp("\\b"+n.replace(/[^a-z]/gi,"")+"\\b","gi"),"the student")});return x}
+function scrub(t){let x=String(t);[...NAME_PARTS,...nameParts()].forEach(n=>{x=x.replace(new RegExp("\\b"+n.replace(/[^a-z]/gi,"")+"\\b","gi"),"the student")});return x}
 const hasMeaning=w=>typeof meaningOf==="function"&&!!meaningOf(w);
 function needScore(w){const p=prog(w);return p.wrong*2-p.right*1.5-(p.right>=3?10:0)}
 function localPlan(){
@@ -1034,6 +1053,27 @@ function bindProCard(){
     catch(e){m.innerHTML=`<div class="feedback bad">${esc(e.message)}</div>`}};
 }
 
+
+function namesCard(){const st=S.settings;
+  return `<div class="trick" style="--c:var(--coral)"><h3>📝 Names</h3>
+    <div class="grid2">
+      <div class="set"><label for="nmTutor">Tutor's name</label><input id="nmTutor" class="field" maxlength="24" value="${esc(TUTOR)}"><small class="hint">The Morse code call sign spells this name.</small></div>
+      <div class="set"><label for="nmStudent">Student's name</label><input id="nmStudent" class="field" maxlength="40" value="${esc(NAME)}"><small class="hint">How the tutor greets them, for example "Master Shakai Stoute".</small></div>
+      <div class="set"><label for="nmShort">Short name</label><input id="nmShort" class="field" maxlength="20" value="${esc(SHORT)}"><small class="hint">Used in encouragement: "${esc(SHORT)}, you are very smart!"</small></div>
+      <div class="set"><label for="nmSay">How to say the names (optional)</label><input id="nmSay" class="field" maxlength="200" placeholder="Shakai=Shah-kye; Stoute=Stowt" value="${esc(st.sayAs??DEFAULT_SAYAS)}"><small class="hint">Write a name, an equals sign, then how it sounds. Separate names with ;</small></div>
+    </div>
+    <div class="row"><button class="btn" style="--c:var(--coral)" id="nmSave">Save names</button><button class="btn ghost" id="nmHear">🔊 Hear it</button><button class="btn ghost" id="nmReset">Back to the original names</button></div></div>`}
+function bindNames(){
+  if(!$("#nmSave"))return;
+  const read=()=>({tutorName:$("#nmTutor").value.trim(),studentName:$("#nmStudent").value.trim(),shortName:$("#nmShort").value.trim(),sayAs:$("#nmSay").value});
+  const withNames=(v,fn)=>{const old=JSON.stringify(S.settings);Object.assign(S.settings,v);applyNames();try{fn()}finally{S.settings=JSON.parse(old);applyNames()}};
+  $("#nmHear").onclick=()=>withNames(read(),()=>speak([`This is ${TUTOR}, calling ${NAME}.`,PRAISE[0]]));
+  $("#nmSave").onclick=()=>{const v=read();if(!v.tutorName||!v.studentName||!v.shortName){toast("Please fill in all three names.");return}
+    Object.assign(S.settings,v);save();applyNames();refreshNames();render();toast("Names saved");speak(`Hello, ${NAME}. I am ${TUTOR}, your personal tutor.`)};
+  $("#nmReset").onclick=()=>confirmBox("Go back to the original names?",()=>{["tutorName","studentName","shortName","sayAs"].forEach(k=>delete S.settings[k]);
+    save();applyNames();refreshNames();render();toast("Original names restored")});
+}
+
 /* ---------- game engine ---------- */
 function startGame(type,list,opts={}){
   const titles={bee:"🐝 Spelling Bee",scramble:"🔀 Unscramble",missing:"🕳️ Missing Letters",rev:"📝 Revision Test"};
@@ -1156,19 +1196,19 @@ const bind={
     if(game&&game.rev)bindGame();
   },
   rewards(){common();$("#cheer").onclick=()=>speak([...PRAISE,...PERSIST])},
-  beryl(){common();bindProCard();
+  beryl(){common();bindProCard();bindNames();
     $("#saveSet").onclick=()=>{S.settings.treat=$("#treat").value||S.settings.treat;S.settings.target=Math.max(5,+$("#target").value||50);
       S.settings.rate=+$("#rate").value;S.settings.revDay=+$("#revDay").value;S.settings.echo=$("#echo").checked;S.settings.breakMin=+$("#breakMin").value;save();render();toast("Settings saved")};
     document.querySelectorAll("[data-sample]").forEach(b=>b.onclick=()=>{const r=+$("#rate").value;
-      if(b.dataset.sample===""){speak(SAMPLE,{rate:r});return}
+      if(b.dataset.sample===""){speak(sampleText(),{rate:r});return}
       const v=ukVoices()[+b.dataset.sample];if(!v)return;
-      if(!synth)return;synth.cancel();const u=new SpeechSynthesisUtterance(sayable(SAMPLE));u.voice=v;u.lang=v.lang;u.rate=r;u.pitch=1;keep.push(u);synth.speak(u)});
-    document.querySelectorAll("[data-nsample]").forEach(b=>b.onclick=()=>{try{AndroidTTS.sample(sayable(SAMPLE),+$("#rate").value,b.dataset.nsample||S.settings.androidVoice&&""||"")}catch(e){}});
+      if(!synth)return;synth.cancel();const u=new SpeechSynthesisUtterance(sayable(sampleText()));u.voice=v;u.lang=v.lang;u.rate=r;u.pitch=1;keep.push(u);synth.speak(u)});
+    document.querySelectorAll("[data-nsample]").forEach(b=>b.onclick=()=>{try{AndroidTTS.sample(sayable(sampleText()),+$("#rate").value,b.dataset.nsample||S.settings.androidVoice&&""||"")}catch(e){}});
     document.querySelectorAll("[data-nuse]").forEach(b=>b.onclick=()=>{S.settings.androidVoice=b.dataset.nuse;save();
       try{AndroidTTS.useVoice(S.settings.androidVoice)}catch(e){}render();toast("Zulu's voice changed");speak(`Hello, ${NAME}. This is my new voice.`)});
     document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const v=ukVoices()[+b.dataset.use];if(!v)return;
       S.settings.voice=v.name;save();render();toast(niceName(v.name)+" is now Zulu's voice");speak(`Hello, ${NAME}. This is my new voice.`)});
-    $("#resetStars").onclick=()=>confirmBox("Reset Stoute's stars to zero?",()=>{S.stars=0;save();render();toast("Stars reset")});
+    $("#resetStars").onclick=()=>confirmBox(`Reset ${esc(SHORT)}'s stars to zero?`,()=>{S.stars=0;save();render();toast("Stars reset")});
   },
   writing(){common();
     document.querySelectorAll("[data-wmode]").forEach(b=>b.onclick=()=>{WR.mode=b.dataset.wmode;WR.ink=[];stopSpeech();render()});
@@ -1222,11 +1262,21 @@ function bindGame(){
 $("#hearBubble").onclick=()=>speak($("#bubble").textContent);
 
 /* ---------- Zulu 1 radio signature call (Morse: Z --.. U ..- L .-.. U ..- 1 .----) ---------- */
-const MORSE={Z:"--..",U:"..-",L:".-..","1":".----"};
-const SIG="ZULU 1";
-$("#morse").innerHTML=SIG.split("").map(c=>c===" "?`<span class="mch gap"></span>`:
-  `<span class="mch"><b>${c}</b><span class="sig">${MORSE[c].split("").map(s=>`<i class="${s==="."?"dot":"dash"}"></i>`).join("")}</span></span>`).join("");
+const MORSE={A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",
+  S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..","0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----."};
+let SIG="ZULU 1";
+/* The call sign is the tutor's name in Morse code (up to 12 letters and numbers) */
+function buildMorse(){SIG=TUTOR.toUpperCase().replace(/[^A-Z0-9 ]/g,"").replace(/\s+/g," ").trim().slice(0,12).trim()||"ZULU 1";
+  const m=$("#morse");m.innerHTML=SIG.split("").map(c=>c===" "?`<span class="mch gap"></span>`:
+    `<span class="mch"><b>${c}</b><span class="sig">${MORSE[c].split("").map(s=>`<i class="${s==="."?"dot":"dash"}"></i>`).join("")}</span></span>`).join("");
+  m.setAttribute("aria-label",`${SIG.split("").join(" ")} in Morse code`)}
+/* Fixed parts of the page that show names */
+function refreshNames(){$("#tutorOf").textContent=`Personal tutor of ${NAME}`;$("#appName").textContent=brand("Zulu 1 Ham Dog Tutor");
+  document.title=TUTOR===DEFAULT_TUTOR?document.title:brand("Zulu 1 Ham Dog Tutor");buildMorse();
+  if(!calling&&!$("#radio").hidden&&($("#radioBtn").dataset.next||"start")==="start")$("#radioTitle").textContent=`Calling ${NAME}`}
 let calling=false;
+refreshNames();
+say(`Woof! Hello ${NAME}. I am Zulu 1 Ham Dog, your very own personal tutor.`,{voice:false});
 function playMorse(done){
   try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){actx=null}
   const unit=95,els=[...document.querySelectorAll("#morse .sig i")],lamp=$("#lamp");
@@ -1249,11 +1299,11 @@ function playMorse(done){
 function signatureCall(mode){
   if(calling)return;calling=true;unlockSpeech();
   const btn=$("#radioBtn"),rep=$("#replayCall");btn.disabled=true;rep.hidden=true;
-  $("#radioTitle").textContent=mode==="start"?"Zulu 1 calling...":"Zulu 1 signing off...";
-  $("#radioText").textContent="Listen to the Morse code: Z U L U 1.";
+  $("#radioTitle").textContent=brand(mode==="start"?"Zulu 1 calling...":"Zulu 1 signing off...");
+  $("#radioText").textContent=`Listen to the Morse code: ${SIG.split("").join(" ")}.`;
   playMorse(()=>{
-    const line=mode==="start"?"This is Zulu one, calling Master Shakai Stoute.":"Zulu one out.";
-    $("#radioTitle").textContent=mode==="start"?"This is Zulu One calling Master Shakai Stoute":"Zulu One out";
+    const line=mode==="start"?`This is Zulu one, calling ${NAME}.`:"Zulu one out.";
+    $("#radioTitle").textContent=brand(mode==="start"?`This is Zulu One calling ${NAME}`:"Zulu One out");
     $("#radioText").textContent=mode==="start"?"Your personal tutor is ready. Let's learn some words!":`Great work today, ${NAME}. You are very bright and shining like the sun!`;
     speak(mode==="start"?[line,"Your personal tutor is ready. Let's learn some words!"]:[`Great work today, ${NAME}.`,line],{rate:.9,onend:()=>{
       calling=false;btn.disabled=false;rep.hidden=false;
@@ -1265,7 +1315,7 @@ function signatureCall(mode){
 function openRadio(mode){
   const r=$("#radio");r.hidden=false;$("#radioBtn").dataset.next=mode;$("#radioBtn").disabled=false;$("#replayCall").hidden=true;
   $("#replayCall").dataset.mode=mode==="start"?"start":"end";
-  if(mode==="start"){$("#radioTitle").textContent="Calling Master Shakai Stoute";$("#radioText").textContent="Tap the button to start today's lesson with Zulu 1.";$("#radioBtn").textContent="📻 Start my lesson"}
+  if(mode==="start"){$("#radioTitle").textContent=`Calling ${NAME}`;$("#radioText").textContent=brand("Tap the button to start today's lesson with Zulu 1.");$("#radioBtn").textContent="📻 Start my lesson"}
   else signatureCall("end");
 }
 $("#radioBtn").onclick=()=>{const n=$("#radioBtn").dataset.next||"start";

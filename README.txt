@@ -50,3 +50,8 @@ plan, memory tricks and mistake explanations made by AI (Claude, by Anthropic).
 Pro sends only spelling words and right/wrong counts; family names are removed first.
 For a commercial setup, use the Pro service in the "server" folder (see server/README.md), so the
 API key never sits on children's devices.
+
+NAMES
+Beryl's corner > Names: change the tutor's name (the Morse call sign follows it), the student's
+name, the short name used in encouragement, and how the names should be spoken
+(for example "Shakai=Shah-kye; Stoute=Stowt"). "Back to the original names" undoes it.

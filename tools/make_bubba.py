@@ -12,12 +12,12 @@ def rep(old, new, count=1):
 
 
 # ---- name, storage, header ----
-rep('/* Shakai is pronounced "Shaaa-Ki" and Stoute like "stout", so the voice is given those spellings */\n'
-    'const sayable=t=>String(t).replace(/\\bShakai\\b/g,"Shah-kye").replace(/\\bStoute\\b/g,"Stowt");',
-    '/* Names the voice should say differently go here */\nconst sayable=t=>String(t);')
+# Bubba's name needs no special pronunciation (done before the name swap below)
+rep('const DEFAULT_SAYAS="Shakai=Shah-kye; Stoute=Stowt";', 'const DEFAULT_SAYAS="";')
 s = s.replace("Master Shakai Stoute", "Master Bubba").replace("Stoute", "Bubba")
-rep('<small>Personal tutor of Master Bubba</small>',
-    '<small>Personal tutor of Master Bubba · Year 7 &amp; 8</small>')
+rep('<small id="tutorOf">Personal tutor of Master Bubba</small>',
+    '<small id="tutorOf">Personal tutor of Master Bubba · Year 7 &amp; 8</small>')
+rep('$("#tutorOf").textContent=`Personal tutor of ${NAME}`;', '$("#tutorOf").textContent=`Personal tutor of ${NAME} · Year 7 & 8`;')
 rep('<title>Zulu 1 Ham Dog Tutor</title>', "<title>Bubba's Zulu 1 Tutor</title>")
 rep('<meta name="apple-mobile-web-app-title" content="Zulu 1 Tutor">', '<meta name="apple-mobile-web-app-title" content="Zulu 1 Bubba">')
 rep('<link rel="apple-touch-icon" href="apple-touch-icon.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">')
