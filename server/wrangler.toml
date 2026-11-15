@@ -1,0 +1,6 @@
+name = "zulu1-pro"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+ZULU_MODEL = "claude-haiku-5-5"

@@ -260,5 +260,13 @@ rep('''.nav{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px}'
 rep('''@media (max-width:760px){.nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nav .tile{font-size:1rem}}''', '''@media (max-width:760px){.nav{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.nav .tile{font-size:1rem}}''')
 rep('''      <div class="trick" style="--c:var(--mint)"><h3>✍️ Writing</h3>''', '''      <div class="trick" style="--c:var(--mint)" hidden><h3>✍️ Writing</h3>''')
 
+# ---- Zulu 1 Pro planner for a Year 7-8 student ----
+rep('''const LEVEL="a young child learning to read and spell, about 5 to 8 years old, in a British English school";''',
+    '''const LEVEL="a Year 7 or Year 8 student (Key Stage 3) in a British English school, learning spellings and subject vocabulary";''')
+rep('''const ACTIVITIES=["learn","bee","scramble","missing","writing","revision"];''', '''const ACTIVITIES=["learn","bee","scramble","missing","meaning","revision"];''')
+
+# ---- keep the full list of family names to remove before anything is sent ----
+rep('''.concat(["Shakai","Bubba","Bubba","Elian"])''', '''.concat(["Shakai","Stoute","Bubba","Elian"])''')
+
 open(dst, "w", encoding="utf-8").write(s)
 print("ok", len(s))

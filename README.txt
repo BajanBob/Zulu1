@@ -42,3 +42,11 @@ Once GitHub Pages is on (Settings > Pages > Branch: gh-pages, / (root)), the tut
   Master Bubba:         https://bajanbob.github.io/Zulu1/bubba/
 Open the link in Safari, tap Share, then "Add to Home Screen" for a puppy icon.
 The website updates by itself every time a change is pushed.
+
+ZULU 1 PRO
+Home shows "Zulu's plan for today": the words that need most practice and the activities to play,
+each with a Start button. It works offline. Switch on Zulu 1 Pro in Beryl's corner to have the
+plan, memory tricks and mistake explanations made by AI (Claude, by Anthropic).
+Pro sends only spelling words and right/wrong counts; family names are removed first.
+For a commercial setup, use the Pro service in the "server" folder (see server/README.md), so the
+API key never sits on children's devices.
