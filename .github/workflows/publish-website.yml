@@ -21,6 +21,7 @@ jobs:
           cp manifest.webmanifest site/
           cp bubba/manifest.webmanifest site/bubba/
           cp -r icons site/
+          cp -r downloads site/
           touch site/.nojekyll
           cd site
           git init -q -b gh-pages
