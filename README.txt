@@ -55,3 +55,7 @@ NAMES
 Beryl's corner > Names: change the tutor's name (the Morse call sign follows it), the student's
 name, the short name used in encouragement, and how the names should be spoken
 (for example "Shakai=Shah-kye; Stoute=Stowt"). "Back to the original names" undoes it.
+
+CHROMEBOOK
+The website installs as an app on a Chromebook (Install icon in Chrome's address bar), using
+manifest.webmanifest and the icons folder. For offline use, see chromebook/HOW TO USE ON A CHROMEBOOK.txt.

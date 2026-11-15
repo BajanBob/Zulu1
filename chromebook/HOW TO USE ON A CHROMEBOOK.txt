@@ -1,0 +1,26 @@
+ZULU 1 PRO ON A CHROMEBOOK
+Two tutors: Master Shakai ("Zulu 1 Tutor") and Master Bubba ("Zulu 1 Bubba").
+Each keeps its own stars and words.
+
+BEST WAY: INSTALL FROM THE WEBSITE (puppy icon in the launcher, own window, always up to date)
+1. Open Chrome and go to:
+     Master Shakai: https://bajanbob.github.io/Zulu1/
+     Master Bubba:  https://bajanbob.github.io/Zulu1/bubba/
+2. Click the Install icon at the right of the address bar (a small screen with a down arrow),
+   or open the Chrome menu (three dots) > Cast, save and share > Install page as app.
+3. Click Install. The tutor now opens from the launcher like any other app.
+
+OFFLINE WAY: USE THE FILES IN THIS ZIP (no internet needed, except for Zulu 1 Pro)
+1. Open the Files app, double-click this zip, and copy the "Zulu 1 Pro - Chromebook" folder
+   into My files (for example into Downloads).
+2. Open the "Master Shakai" or "Master Bubba" folder and double-click the .html file.
+   It opens in Chrome.
+3. Press Ctrl + D to bookmark it so it is easy to find next time.
+Always open the same copy of the file, because stars and words are saved for that copy.
+
+VOICE
+Chromebooks have natural Google UK English voices. In the tutor, open Beryl > Voice samples
+to hear them and choose one.
+
+ZULU 1 PRO
+Open Beryl > Zulu 1 Pro, choose "My own Claude API key", paste the key, Save, then Test connection.
